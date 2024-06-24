@@ -1,42 +1,41 @@
-# **Using Azure AI Studio to evaluation**
+﻿# **使用 Azure AI Studio 進行評估**
 
 ![aistudo](../../imgs/05/AIStudio/AIStudio.png)
 
-How to evaluate your generative AI application using [Azure AI Studio](https://ai.azure.com?WT.mc_id=aiml-138114-kinfeylo). Whether you're assessing single-turn or multi-turn conversations, Azure AI Studio provides tools for evaluating model performance and safety. 
+如何使用 [Azure AI Studio](https://ai.azure.com?WT.mc_id=aiml-138114-kinfeylo) 評估您的生成式 AI 應用程式。無論您是在評估單輪還是多輪對話，Azure AI Studio 都提供了評估模型性能和安全性的工具。
 
 ![aistudo](../../imgs/05/AIStudio/AIPortfolio.png)
 
-Here are the steps to get started:
+以下是開始的步驟:
 
-## Evaluating Generative AI Models in Azure AI Studio
+## 評估生成式 AI 模型在 Azure AI Studio
 
-**Prerequisites**
+**先決條件**
 
-- A test dataset in either CSV or JSON format.
-- A deployed generative AI model (such as Phi-3, GPT 3.5, GPT 4, or Davinci models).
-- A runtime with a compute instance to run the evaluation.
+- 一個 CSV 或 JSON 格式的測試資料集。
+- 一個已部署的生成式 AI 模型（例如 Phi-3、GPT 3.5、GPT 4 或 Davinci 模型）。
+- 一個具有計算實例的運行時來執行評估。
 
-## Built-in Evaluation Metrics
+## 內建評估指標
 
-Azure AI Studio allows you to evaluate both single-turn and complex, multi-turn conversations.
-For Retrieval Augmented Generation (RAG) scenarios, where the model is grounded in specific data, you can assess performance using built-in evaluation metrics.
-Additionally, you can evaluate general single-turn question answering scenarios (non-RAG).
+Azure AI Studio 允許你評估單輪和複雜的多輪對話。
+對於檢索增強生成（RAG）場景，其中模型基於特定數據，你可以使用內建評估指標來評估性能。
+此外，你還可以評估一般的單輪問答場景（非 RAG）。
 
-## Creating an Evaluation Run
+## 建立一個評估執行
 
-From the Azure AI Studio UI, navigate to either the Evaluate page or the Prompt Flow page.
-Follow the evaluation creation wizard to set up an evaluation run. Provide an optional name for your evaluation.
-Select the scenario that aligns with your application's objectives.
-Choose one or more evaluation metrics to assess the model's output.
+從 Azure AI Studio UI，導航到 Evaluate 頁面或 Prompt Flow 頁面。
+按照評估建立精靈來設定評估執行。為您的評估提供一個可選的名稱。
+選擇與您的應用程式目標一致的情境。
+選擇一個或多個評估指標來評估模型的輸出。
 
-## Custom Evaluation Flow (Optional)
+## 自訂評估流程 (選擇性)
 
-For greater flexibility, you can establish a custom evaluation flow. Customize the evaluation process based on your specific requirements.
+為了更大的靈活性，您可以建立自訂的評估流程。根據您的具體需求自訂評估過程。
 
-## Viewing Results
+## 檢視結果
 
-After running the evaluation, log, view, and analyze detailed evaluation metrics in Azure AI Studio. Gain insights into your application's capabilities and limitations.
+執行評估後，在 Azure AI Studio 中記錄、查看和分析詳細的評估指標。深入了解您的應用程式的能力和限制。
 
+**注意** Azure AI Studio 目前處於公開預覽階段，因此請將其用於實驗和開發目的。對於生產工作負載，請考慮其他選項。探索官方 [AI Studio 文件](https://learn.microsoft.com/azure/ai-studio/?WT.mc_id=aiml-138114-kinfeylo) 以獲取更多詳細資訊和逐步指導。
 
-
-**Note** Azure AI Studio is currently in public preview, so use it for experimentation and development purposes. For production workloads, consider other options. Explore the official [AI Studio documentation](https://learn.microsoft.com/azure/ai-studio/?WT.mc_id=aiml-138114-kinfeylo) for more details and step-by-step instructions. 

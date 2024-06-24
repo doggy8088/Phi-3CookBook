@@ -1,36 +1,19 @@
 <!--
-IF SUFFICIENT INFORMATION IS NOT PROVIDED VIA THE FOLLOWING TEMPLATE THE ISSUE MIGHT BE CLOSED WITHOUT FURTHER CONSIDERATION OR INVESTIGATION
+請提供以下資訊回報翻譯錯誤與訂正等資訊，感恩！
 -->
-> Please provide us with the following information:
-> ---------------------------------------------------------------
 
-### This issue is for a: (mark with an `x`)
-```
-- [ ] bug report -> please search issues before submitting
-- [ ] feature request
-- [ ] documentation issue or request
-- [ ] regression (a behavior that used to work and stopped in a new release)
-```
+### 原文連結
 
-### Minimal steps to reproduce
->
+https://github.com/doggy8088/Phi-3CookBook/blob/zh-tw/OOOOO.md
 
-### Any log messages given by the failure
->
+### 原文段落文字
 
-### Expected/desired behavior
->
+> TODO
 
-### OS and Version?
-> Windows 7, 8 or 10. Linux (which distribution). macOS (Yosemite? El Capitan? Sierra?)
+### 翻譯段落文字
 
-### azd version?
-> run `azd version` and copy paste here.
+> TODO
 
-### Versions
->
+### 建議翻譯文字
 
-### Mention any other details that might be useful
-
-> ---------------------------------------------------------------
-> Thanks! We'll be in touch soon.
+> TODO

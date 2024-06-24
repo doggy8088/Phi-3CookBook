@@ -1,39 +1,43 @@
-## How use chat-completion components from the Azure ML system registry to fine tune a model
+﻿## 如何使用 Azure ML 系統註冊表中的聊天完成元件來微調模型
 
-In this example we will undertake fine tuning of the Phi-3-mini-4k-instruct model to complete a conversation between 2 people using ultrachat_200k dataset. 
+在這個範例中，我們將對 Phi-3-mini-4k-instruct 模型進行微調，以使用 ultrachat_200k 資料集完成兩個人之間的對話。
 
 ![MLFineTune](../../imgs/04/03/MLFineTune.png)
 
-The example will show you how to undertake fine tuning using the Azure ML SDK and Python and then deploy the fine tuned model to an online endpoint for real time inference.
+範例將向您展示如何使用 Azure ML SDK 和 Python 進行微調，然後將微調後的模型部署到線上端點以進行即時推論。
 
-### Training data
-We will use the ultrachat_200k dataset. This is a heavily filtered version of the UltraChat dataset and was used to train Zephyr-7B-β, a state of the art 7b chat model.
+### 訓練資料
 
-### Model
-We will use the Phi-3-mini-4k-instruct model to show how user can finetune a model for chat-completion task. If you opened this notebook from a specific model card, remember to replace the specific model name.
+我們將使用 ultrachat_200k 資料集。這是 UltraChat 資料集的經過大量過濾的版本，用於訓練 Zephyr-7B-β，這是一個最先進的 7B 聊天模型。
 
-### Tasks 
-- Pick a model to fine tune.
-- Pick and explore training data.
-- Configure the fine tuning job.
-- Run the fine tuning job.
-- Review training and evaluation metrics.
-- Register the fine tuned model.
-- Deploy the fine tuned model for real time inference.
-- Clean up resources.
+### 模型
 
-## 1. Setup pre-requisites
-- Install dependencies
-- Connect to AzureML Workspace. Learn more at set up SDK authentication. Replace <WORKSPACE_NAME>, <RESOURCE_GROUP> and <SUBSCRIPTION_ID> below.
-- Connect to azureml system registry
-- Set an optional experiment name
-- Check or create compute. 
+我們將使用 Phi-3-mini-4k-instruct 模型來展示使用者如何微調模型以完成聊天任務。如果你是從特定模型卡片打開這個筆記本，請記得替換特定的模型名稱。
 
-Requirements a single GPU node can have multiple GPU cards. For example, in one node of Standard_NC24rs_v3 there are 4 NVIDIA V100 GPUs while in Standard_NC12s_v3, there are 2 NVIDIA V100 GPUs. Refer to the docs for this information. The number of GPU cards per node is set in the param gpus_per_node below. Setting this value correctly will ensure utilization of all GPUs in the node. The recommended GPU compute SKUs can be found here and here.
+### 任務
 
-### Python Libraries
+- 選擇一個模型進行微調。
+- 選擇並探索訓練資料。
+- 配置微調任務。
+- 執行微調任務。
+- 審查訓練和評估指標。
+- 註冊微調後的模型。
+- 部署微調後的模型以進行實時推論。
+- 清理資源。
 
-Install dependencies by running below cell. This is not an optional step if running in a new environment.
+## 1. 設定前置條件
+
+- 安裝相依套件
+- 連接到 AzureML Workspace。了解更多在設定 SDK 認證。替換 <WORKSPACE_NAME>、<RESOURCE_GROUP> 和 <SUBSCRIPTION_ID>。
+- 連接到 azureml 系統註冊表
+- 設定一個可選的實驗名稱
+- 檢查或建立運算。
+
+單個 GPU 節點可以有多個 GPU 卡的需求。例如，在一個 Standard_NC24rs_v3 節點中有 4 個 NVIDIA V100 GPUs，而在 Standard_NC12s_v3 中有 2 個 NVIDIA V100 GPUs。請參考文件以獲取此資訊。每個節點的 GPU 卡數量在下面的參數 gpus_per_node 中設定。正確設定此值將確保節點中所有 GPU 的利用率。推薦的 GPU 計算 SKUs 可以在[這裡](https://example.com)和[這裡](https://example.com)找到。
+
+### Python 函式庫
+
+安裝相依套件，方法是執行以下單元。如果在新環境中執行，這不是可選步驟。
 
 ```
 pip install azure-ai-ml
@@ -42,44 +46,44 @@ pip install datasets==2.9.0
 pip install mlflow
 pip install azureml-mlflow
 ```
-### Interacting with Azure ML 
 
-This Python script is used to interact with Azure Machine Learning (Azure ML) service. Here's a breakdown of what it does:
+### 與 Azure ML 互動
 
-It imports necessary modules from the azure.ai.ml, azure.identity, and azure.ai.ml.entities packages. It also imports the time module.
+這個 Python 程式碼用於與 Azure 機器學習（Azure ML）服務互動。以下是它的功能分解：
 
-It tries to authenticate using DefaultAzureCredential(), which provides a simplified authentication experience to quickly start developing applications run in the Azure cloud. If this fails, it falls back to InteractiveBrowserCredential(), which provides an interactive login prompt.
+它從 azure.ai.ml、azure.identity 和 azure.ai.ml.entities 套件匯入必要的模組。它還匯入了 time 模組。
 
-It then tries to create an MLClient instance using the from_config method, which reads the configuration from the default config file (config.json). If this fails, it creates an MLClient instance by manually providing the subscription_id, resource_group_name, and workspace_name.
+它嘗試使用 DefaultAzureCredential() 進行身份驗證，這提供了一個簡化的身份驗證體驗，以便快速開始開發在 Azure 雲端中執行的應用程式。如果這失敗，它會退回到 InteractiveBrowserCredential()，這提供了一個互動式的登入提示。
 
-It creates another MLClient instance, this time for the Azure ML registry named "azureml". This registry is where models, fine-tuning pipelines, and environments are stored.
+然後，它嘗試使用 from_config 方法來建立一個 MLClient 實例，該方法從預設的配置檔案（config.json）中讀取配置。如果這失敗，它會通過手動提供 subscription_id、resource_group_name 和 workspace_name 來建立一個 MLClient 實例。
 
-It sets the experiment_name to "chat_completion_Phi-3-mini-4k-instruct".
+它建立了另一個 MLClient 實例，這次是為名為 "azureml" 的 Azure ML 註冊表。這個註冊表是存儲模型、微調管道和環境的地方。
 
-It generates a unique timestamp by converting the current time (in seconds since the epoch, as a floating point number) to an integer and then to a string. This timestamp can be used for creating unique names and versions.
+它將 experiment_name 設定為 "chat_completion_Phi-3-mini-4k-instruct"。
 
+它通過將當前時間（自紀元以來的秒數，作為浮點數）轉換為整數，然後轉換為字串來生成唯一的時間戳。此時間戳可用於建立唯一的名稱和版本。
 
 ```
-# Import necessary modules from Azure ML and Azure Identity
+# 從 Azure ML 和 Azure Identity 匯入必要的模組
 from azure.ai.ml import MLClient
 from azure.identity import (
     DefaultAzureCredential,
     InteractiveBrowserCredential,
 )
 from azure.ai.ml.entities import AmlCompute
-import time  # Import time module
+import time  # 匯入 time 模組
 
-# Try to authenticate using DefaultAzureCredential
+# 嘗試使用 DefaultAzureCredential 進行驗證
 try:
     credential = DefaultAzureCredential()
     credential.get_token("https://management.azure.com/.default")
-except Exception as ex:  # If DefaultAzureCredential fails, use InteractiveBrowserCredential
+except Exception as ex:  # 如果 DefaultAzureCredential 失敗，使用 InteractiveBrowserCredential
     credential = InteractiveBrowserCredential()
 
-# Try to create an MLClient instance using the default config file
+# 嘗試使用預設配置檔案建立一個 MLClient 實例
 try:
     workspace_ml_client = MLClient.from_config(credential=credential)
-except:  # If that fails, create an MLClient instance by manually providing the details
+except:  # 如果失敗，通過手動提供詳細資訊來建立一個 MLClient 實例
     workspace_ml_client = MLClient(
         credential,
         subscription_id="<SUBSCRIPTION_ID>",
@@ -87,331 +91,344 @@ except:  # If that fails, create an MLClient instance by manually providing the 
         workspace_name="<WORKSPACE_NAME>",
     )
 
-# Create another MLClient instance for the Azure ML registry named "azureml"
-# This registry is where models, fine-tuning pipelines, and environments are stored
+# 為名為 "azureml" 的 Azure ML registry 建立另一個 MLClient 實例
+# 這個 registry 是存儲模型、微調管道和環境的地方
 registry_ml_client = MLClient(credential, registry_name="azureml")
 
-# Set the experiment name
+# 設定實驗名稱
 experiment_name = "chat_completion_Phi-3-mini-4k-instruct"
 
-# Generate a unique timestamp that can be used for names and versions that need to be unique
+# 生成一個唯一的時間戳，可用於需要唯一名稱和版本的地方
 timestamp = str(int(time.time()))
 ```
-## 2. Pick a foundation model to fine tune
-Phi-3-mini-4k-instruct is a 3.8B parameters, lightweight, state-of-the-art open model built upon datasets used for Phi-2. The model belongs to the Phi-3 model family, and the Mini version comes in two variants 4K and 128K which is the context length (in tokens) it can support, we need to finetune the model for our specific purpose in order to use it. You can browse these models in the Model Catalog in the AzureML Studio, filtering by the chat-completion task. In this example, we use the Phi-3-mini-4k-instruct model. If you have opened this notebook for a different model, replace the model name and version accordingly.
 
-Note the model id property of the model. This will be passed as input to the fine tuning job. This is also available as the Asset ID field in model details page in AzureML Studio Model Catalog.
+## 2. 選擇一個基礎模型進行微調
 
-This Python script is interacting with Azure Machine Learning (Azure ML) service. Here's a breakdown of what it does:
+Phi-3-mini-4k-instruct 是一個 3.8B 參數的輕量級、先進的開放模型，基於 Phi-2 使用的數據集構建。該模型屬於 Phi-3 模型家族，Mini 版本有兩個變體 4K 和 128K，這是它可以支持的上下文長度（以 tokens 計算），我們需要為我們的特定目的微調該模型以便使用。你可以在 AzureML Studio 的 Model Catalog 中瀏覽這些模型，按 chat-completion 任務進行篩選。在這個範例中，我們使用 Phi-3-mini-4k-instruct 模型。如果你為不同的模型打開了這個 notebook，請相應地更換模型名稱和版本。
 
-It sets the model_name to "Phi-3-mini-4k-instruct".
+請注意模型的 model id 屬性。這將作為輸入傳遞給微調工作。在 AzureML Studio Model Catalog 的模型詳細資訊頁面中，這也可作為 Asset ID 欄位使用。
 
-It uses the get method of the models property of the registry_ml_client object to retrieve the latest version of the model with the specified name from the Azure ML registry. The get method is called with two arguments: the name of the model and a label specifying that the latest version of the model should be retrieved.
+這個 Python 程式碼正在與 Azure Machine Learning (Azure ML) 服務互動。以下是它的作用分解：
 
-It prints a message to the console indicating the name, version, and id of the model that will be used for fine-tuning. The format method of the string is used to insert the name, version, and id of the model into the message. The name, version, and id of the model are accessed as properties of the foundation_model object.
+它將 model_name 設定為 "Phi-3-mini-4k-instruct"。
+
+它使用 registry_ml_client 物件的 models 屬性的 get 方法從 Azure ML 註冊表中檢索具有指定名稱的模型的最新版本。get 方法被呼叫時帶有兩個參數：模型的名稱和一個標籤，指定應檢索模型的最新版本。
+
+它會在控制台上列印一條訊息，指示將用於微調的模型的名稱、版本和 ID。字串的 format 方法被用來將模型的名稱、版本和 ID 插入訊息中。模型的名稱、版本和 ID 作為 foundation_model 物件的屬性來訪問。
 
 ```
-# Set the model name
+# 設定模型名稱
 model_name = "Phi-3-mini-4k-instruct"
 
-# Get the latest version of the model from the Azure ML registry
+# 從 Azure ML 註冊表中獲取最新版本的模型
 foundation_model = registry_ml_client.models.get(model_name, label="latest")
 
-# Print the model name, version, and id
-# This information is useful for tracking and debugging
+# 列印模型名稱、版本和 id
+# 這些資訊對於追蹤和除錯很有用
 print(
-    "\n\nUsing model name: {0}, version: {1}, id: {2} for fine tuning".format(
+    "\n\n使用模型名稱: {0}, 版本: {1}, id: {2} 進行微調".format(
         foundation_model.name, foundation_model.version, foundation_model.id
     )
 )
 ```
-## 3. Create a compute to be used with the job
-The finetune job works ONLY with GPU compute. The size of the compute depends on how big the model is and in most cases it becomes tricky to identify the right compute for the job. In this cell, we guide the user to select the right compute for the job.
 
-**NOTE1** The computes listed below work with the most optimized configuration. Any changes to the configuration might lead to Cuda Out Of Memory error. In such cases, try to upgrade the compute to a bigger compute size.
+## 3. 建立一個計算來與這個工作一起使用
 
-**NOTE2** While selecting the compute_cluster_size below, make sure the compute is available in your resource group. If a particular compute is not available you can make a request to get access to the compute resources.
+微調工作僅適用於 GPU 計算。計算的大小取決於模型的大小，在大多數情況下，識別適合工作的計算變得棘手。在此單元中，我們指導使用者選擇適合工作的計算。
 
-### Checking Model for Fine Tuning Support
-This Python script is interacting with an Azure Machine Learning (Azure ML) model. Here's a breakdown of what it does:
+**注意1** 下列計算機在最優化配置下工作。任何對配置的更改可能會導致 Cuda 記憶體不足錯誤。在這種情況下，請嘗試將計算機升級到更大的計算機尺寸。
 
-It imports the ast module, which provides functions to process trees of the Python abstract syntax grammar.
+**NOTE2** 在選擇下面的 compute_cluster_size 時，請確保計算資源在您的資源群組中可用。如果某個特定的計算資源不可用，您可以請求獲取該計算資源的訪問權限。
 
-It checks if the foundation_model object (which represents a model in Azure ML) has a tag named finetune_compute_allow_list. Tags in Azure ML are key-value pairs that you can create and use to filter and sort models.
+### 檢查模型是否支援微調
 
-If the finetune_compute_allow_list tag is present, it uses the ast.literal_eval function to safely parse the tag's value (a string) into a Python list. This list is then assigned to the computes_allow_list variable. It then prints a message indicating that a compute should be created from the list.
+這個 Python 程式碼正在與 Azure Machine Learning (Azure ML) 模型互動。以下是它的功能分解:
 
-If the finetune_compute_allow_list tag is not present, it sets computes_allow_list to None and prints a message indicating that the finetune_compute_allow_list tag is not part of the model's tags.
+它匯入了 ast 模組，該模組提供處理 Python 抽象語法樹的函式。
 
-In summary, this script is checking for a specific tag in the model's metadata, converting the tag's value to a list if it exists, and providing feedback to the user accordingly.
+它檢查 foundation_model 物件 (代表 Azure ML 中的一個模型) 是否有一個名為 finetune_compute_allow_list 的標籤。Azure ML 中的標籤是可以建立並用來篩選和排序模型的鍵值對。
+
+如果 finetune_compute_allow_list 標籤存在，它會使用 ast.literal_eval 函式來安全地解析標籤的值（字串）為 Python 清單。然後將此清單分配給 computes_allow_list 變數。接著，它會打印一條訊息，指示應從清單中建立一個計算。
+
+如果 finetune_compute_allow_list 標籤不存在，則將 computes_allow_list 設為 None，並顯示一條訊息，指出 finetune_compute_allow_list 標籤不是模型標籤的一部分。
+
+總結來說，這段程式碼正在檢查模型的 Metadata 中的特定標籤，將標籤的值轉換為列表（如果存在的話），並相應地向用戶提供反饋。
 
 ```
-# Import the ast module, which provides functions to process trees of the Python abstract syntax grammar
+# 匯入 ast 模組, 提供處理 Python 抽象語法樹的函式
 import ast
 
-# Check if the 'finetune_compute_allow_list' tag is present in the model's tags
+# 檢查 'finetune_compute_allow_list' 標籤是否存在於模型的標籤中
 if "finetune_compute_allow_list" in foundation_model.tags:
-    # If the tag is present, use ast.literal_eval to safely parse the tag's value (a string) into a Python list
+    # 如果標籤存在, 使用 ast.literal_eval 安全地將標籤的值（字串）解析成 Python 列表
     computes_allow_list = ast.literal_eval(
         foundation_model.tags["finetune_compute_allow_list"]
-    )  # convert string to python list
-    # Print a message indicating that a compute should be created from the list
+    )  # 將字串轉換為 python 列表
+    # 列印訊息, 指示應從列表中建立計算
     print(f"Please create a compute from the above list - {computes_allow_list}")
 else:
-    # If the tag is not present, set computes_allow_list to None
+    # 如果標籤不存在, 將 computes_allow_list 設為 None
     computes_allow_list = None
-    # Print a message indicating that the 'finetune_compute_allow_list' tag is not part of the model's tags
+    # 列印訊息, 指示 'finetune_compute_allow_list' 標籤不在模型的標籤中
     print("`finetune_compute_allow_list` is not part of model tags")
 ```
-### Checking Compute Instance 
 
-This Python script is interacting with Azure Machine Learning (Azure ML) service and performing several checks on a compute instance. Here's a breakdown of what it does:
+### 檢查 Compute Instance
 
-It tries to retrieve the compute instance with the name stored in compute_cluster from the Azure ML workspace. If the compute instance's provisioning state is "failed", it raises a ValueError.
+這個 Python 程式碼正在與 Azure Machine Learning (Azure ML) 服務互動，並對計算實例執行多項檢查。以下是它的功能分解：
 
-It checks if computes_allow_list is not None. If it's not, it converts all the compute sizes in the list to lowercase and checks if the size of the current compute instance is in the list. If it's not, it raises a ValueError.
+它嘗試從 Azure ML 工作區中檢索存儲在 compute_cluster 中的計算實例。如果計算實例的佈建狀態為 "failed"，則引發 ValueError。
 
-If computes_allow_list is None, it checks if the size of the compute instance is in a list of unsupported GPU VM sizes. If it is, it raises a ValueError.
+它會檢查 computes_allow_list 是否不為 None。如果不是，它會將列表中的所有計算大小轉換為小寫，並檢查當前計算實例的大小是否在列表中。如果不是，它會引發 ValueError。
 
-It retrieves a list of all available compute sizes in the workspace. It then iterates over this list, and for each compute size, it checks if its name matches the size of the current compute instance. If it does, it retrieves the number of GPUs for that compute size and sets gpu_count_found to True.
+如果 computes_allow_list 為 None，則檢查計算實例的大小是否在不支援的 GPU VM 大小列表中。如果是，則引發 ValueError。
 
-If gpu_count_found is True, it prints the number of GPUs in the compute instance. If gpu_count_found is False, it raises a ValueError.
+它檢索工作區中所有可用計算大小的列表。然後遍歷此列表，並對每個計算大小檢查其名稱是否與當前計算實例的大小匹配。如果匹配，它會檢索該計算大小的 GPU 數量並將 gpu_count_found 設置為 True。
 
-In summary, this script is performing several checks on a compute instance in an Azure ML workspace, including checking its provisioning state, its size against an allow list or a deny list, and the number of GPUs it has.
+如果 gpu_count_found 為 True，則會列印計算實例中的 GPU 數量。如果 gpu_count_found 為 False，則會引發 ValueError。
+
+總結來說，此腳本正在對 Azure ML 工作區中的一個計算實例執行多項檢查，包括檢查其佈建狀態、其大小是否在允許列表或拒絕列表中，以及其擁有的 GPU 數量。
+
 ```
-# Print the exception message
+# 列印例外訊息
 print(e)
-# Raise a ValueError if the compute size is not available in the workspace
+# 如果工作區中沒有可用的計算大小，則引發 ValueError
 raise ValueError(
-    f"WARNING! Compute size {compute_cluster_size} not available in workspace"
+    f"警告！計算大小 {compute_cluster_size} 在工作區中不可用"
 )
 
-# Retrieve the compute instance from the Azure ML workspace
+# 從 Azure ML 工作區中檢索計算實例
 compute = workspace_ml_client.compute.get(compute_cluster)
-# Check if the provisioning state of the compute instance is "failed"
+# 檢查計算實例的配置狀態是否為 "failed"
 if compute.provisioning_state.lower() == "failed":
-    # Raise a ValueError if the provisioning state is "failed"
+    # 如果配置狀態為 "failed"，則引發 ValueError
     raise ValueError(
-        f"Provisioning failed, Compute '{compute_cluster}' is in failed state. "
-        f"please try creating a different compute"
+        f"配置失敗，計算 '{compute_cluster}' 處於失敗狀態。"
+        f"請嘗試建立不同的計算"
     )
 
-# Check if computes_allow_list is not None
+# 檢查 computes_allow_list 是否不為 None
 if computes_allow_list is not None:
-    # Convert all compute sizes in computes_allow_list to lowercase
+    # 將 computes_allow_list 中的所有計算大小轉換為小寫
     computes_allow_list_lower_case = [x.lower() for x in computes_allow_list]
-    # Check if the size of the compute instance is in computes_allow_list_lower_case
+    # 檢查計算實例的大小是否在 computes_allow_list_lower_case 中
     if compute.size.lower() not in computes_allow_list_lower_case:
-        # Raise a ValueError if the size of the compute instance is not in computes_allow_list_lower_case
+        # 如果計算實例的大小不在 computes_allow_list_lower_case 中，則引發 ValueError
         raise ValueError(
-            f"VM size {compute.size} is not in the allow-listed computes for finetuning"
+            f"VM 大小 {compute.size} 不在允許微調的計算列表中"
         )
 else:
-    # Define a list of unsupported GPU VM sizes
+    # 定義不支援的 GPU VM 大小列表
     unsupported_gpu_vm_list = [
         "standard_nc6",
         "standard_nc12",
         "standard_nc24",
         "standard_nc24r",
     ]
-    # Check if the size of the compute instance is in unsupported_gpu_vm_list
+    # 檢查計算實例的大小是否在 unsupported_gpu_vm_list 中
     if compute.size.lower() in unsupported_gpu_vm_list:
-        # Raise a ValueError if the size of the compute instance is in unsupported_gpu_vm_list
+        # 如果計算實例的大小在 unsupported_gpu_vm_list 中，則引發 ValueError
         raise ValueError(
-            f"VM size {compute.size} is currently not supported for finetuning"
+            f"VM 大小 {compute.size} 目前不支援微調"
         )
 
-# Initialize a flag to check if the number of GPUs in the compute instance has been found
+# 初始化一個標誌以檢查是否已找到計算實例中的 GPU 數量
 gpu_count_found = False
-# Retrieve a list of all available compute sizes in the workspace
+# 檢索工作區中所有可用計算大小的列表
 workspace_compute_sku_list = workspace_ml_client.compute.list_sizes()
 available_sku_sizes = []
-# Iterate over the list of available compute sizes
+# 遍歷可用計算大小的列表
 for compute_sku in workspace_compute_sku_list:
     available_sku_sizes.append(compute_sku.name)
-    # Check if the name of the compute size matches the size of the compute instance
+    # 檢查計算大小的名稱是否與計算實例的大小匹配
     if compute_sku.name.lower() == compute.size.lower():
-        # If it does, retrieve the number of GPUs for that compute size and set gpu_count_found to True
+        # 如果匹配，則檢索該計算大小的 GPU 數量並將 gpu_count_found 設置為 True
         gpus_per_node = compute_sku.gpus
         gpu_count_found = True
-# If gpu_count_found is True, print the number of GPUs in the compute instance
+# 如果 gpu_count_found 為 True，則列印計算實例中的 GPU 數量
 if gpu_count_found:
-    print(f"Number of GPU's in compute {compute.size}: {gpus_per_node}")
+    print(f"計算 {compute.size} 中的 GPU 數量: {gpus_per_node}")
 else:
-    # If gpu_count_found is False, raise a ValueError
+    # 如果 gpu_count_found 為 False，則引發 ValueError
     raise ValueError(
-        f"Number of GPU's in compute {compute.size} not found. Available skus are: {available_sku_sizes}."
-        f"This should not happen. Please check the selected compute cluster: {compute_cluster} and try again."
+        f"未找到計算 {compute.size} 中的 GPU 數量。可用的 skus 是: {available_sku_sizes}。"
+        f"這不應該發生。請檢查選定的計算叢集: {compute_cluster} 並重試。"
     )
 ```
 
-## 4. Pick the dataset for fine-tuning the model
+## 4. 選擇資料集以微調模型
 
-We use the ultrachat_200k dataset. The dataset has four splits, suitable for:
+我們使用 ultrachat_200k 數據集。該數據集有四個分割，適用於:
 
-Supervised fine-tuning (sft).
-Generation ranking (gen). The number of examples per split is shown as follows:
+監督微調 (sft)。
+生成排名 (gen)。每個分割的範例數量如下所示:
 train_sft	test_sft	train_gen	test_gen
 207865	23110	256032	28304
-The next few cells show basic data preparation for fine tuning:
+接下來的幾個單元顯示了微調的基本資料準備:
 
-Visualize some data rows
-We want this sample to run quickly, so save train_sft, test_sft files containing 5% of the already trimmed rows. This means the fine tuned model will have lower accuracy, hence it should not be put to real-world use.
-The download-dataset.py is used to download the ultrachat_200k dataset and transform the dataset into finetune pipeline component consumable format. Also as the dataset is large, hence we here have only part of the dataset.
+視覺化一些資料列
+我們希望這個範例能夠快速執行，所以保存包含已經修剪過的 5% 資料列的 train_sft 和 test_sft 檔案。這意味著微調過的模型將具有較低的準確性，因此不應用於實際應用中。
+download-dataset.py 用於下載 ultrachat_200k 資料集並將資料集轉換為微調管道元件可消耗的格式。由於資料集很大，因此我們這裡只有部分資料集。
 
-Running the below script only downloads 5% of the data. This can be increased by changing dataset_split_pc parameter to desired percenetage.
+執行以下腳本僅下載 5% 的資料。這可以通過將 dataset_split_pc 參數更改為所需的百分比來增加。
 
-**Note:** Some language models have different language codes and hence the column names in the dataset should reflect the same.
+**注意:** 一些語言模型有不同的語言程式碼，因此資料集中的欄位名稱應該反映相同的情況。
 
-Here is an example of how the data should look like
-The chat-completion dataset is stored in parquet format with each entry using the following schema:
+這是一個資料應該如何顯示的範例
+聊天完成資料集以 parquet 格式儲存，每個條目使用以下結構:
 
-This is a JSON (JavaScript Object Notation) document, which is a popular data interchange format. It's not executable code, but a way to store and transport data. Here's a breakdown of its structure:
+這是一個 JSON (JavaScript 物件表示法) 文件，它是一種流行的資料交換格式。它不是可執行的程式碼，而是一種儲存和傳輸資料的方式。以下是其結構的分解：
 
-"prompt": This key holds a string value that represents a task or question posed to an AI assistant.
+"prompt": 此鍵包含一個字串值，代表對 AI 助手提出的任務或問題。
 
-"messages": This key holds an array of objects. Each object represents a message in a conversation between a user and an AI assistant. Each message object has two keys:
+"messages": 此鍵保存一個物件陣列。每個物件代表使用者和 AI 助手之間對話中的一則訊息。每個訊息物件有兩個鍵:
 
-"content": This key holds a string value that represents the content of the message.
-"role": This key holds a string value that represents the role of the entity that sent the message. It can be either "user" or "assistant".
-"prompt_id": This key holds a string value that represents a unique identifier for the prompt.
+"content": 此鍵持有一個字串值，表示訊息的內容。
+"role": 此鍵持有一個字串值，表示發送訊息的實體角色。它可以是 "user" 或 "assistant"。
+"prompt_id": 此鍵持有一個字串值，表示提示的唯一標識符。
 
-In this specific JSON document, a conversation is represented where a user asks an AI assistant to create a protagonist for a dystopian story. The assistant responds, and the user then asks for more details. The assistant agrees to provide more details. The entire conversation is associated with a specific prompt id.
+在這個特定的 JSON 文件中，對話顯示一位使用者要求 AI 助手建立一個反烏托邦故事的主角。助手回應後，使用者要求更多資訊。助手同意提供更多資訊。整個對話與一個特定的提示 ID 相關聯。
 
 ```
 {
-    // The task or question posed to an AI assistant
-    "prompt": "Create a fully-developed protagonist who is challenged to survive within a dystopian society under the rule of a tyrant. ...",
-    
-    // An array of objects, each representing a message in a conversation between a user and an AI assistant
+    // 提給 AI 助理的任務或問題
+    "prompt": "建立一個完整發展的主角，她在暴君統治下的反烏托邦社會中面臨生存挑戰。 ...",
+
+    // 一個物件陣列，每個物件代表使用者和 AI 助理之間對話中的一條訊息
     "messages":[
         {
-            // The content of the user's message
-            "content": "Create a fully-developed protagonist who is challenged to survive within a dystopian society under the rule of a tyrant. ...",
-            // The role of the entity that sent the message
+            // 使用者訊息的內容
+            "content": "建立一個完整發展的主角，她在暴君統治下的反烏托邦社會中面臨生存挑戰。 ...",
+            // 發送訊息的實體角色
             "role": "user"
         },
         {
-            // The content of the assistant's message
-            "content": "Name: Ava\n\n Ava was just 16 years old when the world as she knew it came crashing down. The government had collapsed, leaving behind a chaotic and lawless society. ...",
-            // The role of the entity that sent the message
+            // 助理訊息的內容
+            "content": "名字: Ava\n\n Ava 在她16歲時，世界如她所知的那樣崩潰了。政府倒台，留下了一個混亂且無法無天的社會。 ...",
+            // 發送訊息的實體角色
             "role": "assistant"
         },
         {
-            // The content of the user's message
-            "content": "Wow, Ava's story is so intense and inspiring! Can you provide me with more details.  ...",
-            // The role of the entity that sent the message
+            // 使用者訊息的內容
+            "content": "哇，Ava 的故事如此激烈且鼓舞人心！你能給我更多的細節嗎。 ...",
+            // 發送訊息的實體角色
             "role": "user"
-        }, 
+        },
         {
-            // The content of the assistant's message
-            "content": "Certainly! ....",
-            // The role of the entity that sent the message
+            // 助理訊息的內容
+            "content": "當然可以！ ....",
+            // 發送訊息的實體角色
             "role": "assistant"
         }
     ],
-    
-    // A unique identifier for the prompt
+
+    // 提示的唯一標識符
     "prompt_id": "d938b65dfe31f05f80eb8572964c6673eddbd68eff3db6bd234d7f1e3b86c2af"
 }
 ```
-### Download Data 
-This Python script is used to download a dataset using a helper script named download-dataset.py. Here's a breakdown of what it does:
 
-It imports the os module, which provides a portable way of using operating system dependent functionality.
+### 下載資料
 
-It uses the os.system function to run the download-dataset.py script in the shell with specific command-line arguments. The arguments specify the dataset to download (HuggingFaceH4/ultrachat_200k), the directory to download it to (ultrachat_200k_dataset), and the percentage of the dataset to split (5). The os.system function returns the exit status of the command it executed; this status is stored in the exit_status variable.
+這個 Python 程式碼用來使用名為 download-dataset.py 的輔助程式碼下載一個數據集。以下是它的功能分解：
 
-It checks if exit_status is not 0. In Unix-like operating systems, an exit status of 0 usually indicates that a command has succeeded, while any other number indicates an error. If exit_status is not 0, it raises an Exception with a message indicating that there was an error downloading the dataset.
+它匯入了 os 模組，這提供了一種使用作業系統相依功能的可移植方式。
 
-In summary, this script is running a command to download a dataset using a helper script, and it raises an exception if the command fails.
+它使用 os.system 函式在 shell 中執行 download-dataset.py 腳本，並帶有特定的命令列參數。這些參數指定要下載的資料集 (HuggingFaceH4/ultrachat_200k)、下載目錄 (ultrachat_200k_dataset) 和要分割的資料集百分比 (5)。os.system 函式返回它所執行命令的退出狀態；此狀態存儲在 exit_status 變數中。
+
+它檢查 exit_status 是否不為 0。在類 Unix 作業系統中，exit_status 為 0 通常表示命令成功，而任何其他數字表示錯誤。如果 exit_status 不為 0，它會引發一個 Exception，並顯示一條訊息，指出下載數據集時發生錯誤。
+
+總結來說，這個腳本正在執行一個命令來使用輔助腳本下載資料集，如果命令失敗則會引發異常。
 
 ```
-# Import the os module, which provides a way of using operating system dependent functionality
+# 匯入 os 模組，提供使用作業系統相關功能的方法
 import os
 
-# Use the os.system function to run the download-dataset.py script in the shell with specific command-line arguments
-# The arguments specify the dataset to download (HuggingFaceH4/ultrachat_200k), the directory to download it to (ultrachat_200k_dataset), and the percentage of the dataset to split (5)
-# The os.system function returns the exit status of the command it executed; this status is stored in the exit_status variable
+# 使用 os.system 函式在 shell 中執行 download-dataset.py 腳本，並帶有特定的命令列參數
+# 參數指定要下載的資料集 (HuggingFaceH4/ultrachat_200k)、下載的目錄 (ultrachat_200k_dataset)，以及要分割的資料集百分比 (5)
+# os.system 函式返回它執行的命令的退出狀態；此狀態存儲在 exit_status 變數中
 exit_status = os.system(
     "python ./download-dataset.py --dataset HuggingFaceH4/ultrachat_200k --download_dir ultrachat_200k_dataset --dataset_split_pc 5"
 )
 
-# Check if exit_status is not 0
-# In Unix-like operating systems, an exit status of 0 usually indicates that a command has succeeded, while any other number indicates an error
-# If exit_status is not 0, raise an Exception with a message indicating that there was an error downloading the dataset
+# 檢查 exit_status 是否不為 0
+# 在類 Unix 作業系統中，退出狀態為 0 通常表示命令成功，而任何其他數字表示錯誤
+# 如果 exit_status 不為 0，則引發一個異常，並顯示一條消息，指示下載資料集時出現錯誤
 if exit_status != 0:
-    raise Exception("Error downloading dataset")
+    raise Exception("下載資料集時出現錯誤")
 ```
-### Loading Data into a DataFrame
-This Python script is loading a JSON Lines file into a pandas DataFrame and displaying the first 5 rows. Here's a breakdown of what it does:
 
-It imports the pandas library, which is a powerful data manipulation and analysis library.
+### 將資料載入 DataFrame
 
-It sets the maximum column width for pandas' display options to 0. This means that the full text of each column will be displayed without truncation when the DataFrame is printed.
+這個 Python 程式碼正在將一個 JSON Lines 文件載入 pandas DataFrame 並顯示前 5 行。以下是它的功能分解：
 
-It uses the pd.read_json function to load the train_sft.jsonl file from the ultrachat_200k_dataset directory into a DataFrame. The lines=True argument indicates that the file is in JSON Lines format, where each line is a separate JSON object.
+它匯入了 pandas 函式庫，這是一個強大的資料操作和分析函式庫。
 
-It uses the head method to display the first 5 rows of the DataFrame. If the DataFrame has less than 5 rows, it will display all of them.
+它將 pandas 的顯示選項的最大列寬設置為 0。這意味著當 DataFrame 被列印時，每列的完整文本將顯示而不會被截斷。
 
-In summary, this script is loading a JSON Lines file into a DataFrame and displaying the first 5 rows with full column text.
+它使用 pd.read_json 函式從 ultrachat_200k_dataset 目錄中載入 train_sft.jsonl 檔案到 DataFrame。lines=True 參數表示檔案是 JSON Lines 格式，其中每一行都是一個獨立的 JSON 物件。
+
+它使用 head 方法顯示 DataFrame 的前 5 行。如果 DataFrame 少於 5 行，它將顯示所有行。
+
+總結來說，這個程式碼正在將一個 JSON Lines 文件載入到一個 DataFrame 並顯示前 5 行的完整欄位文字。
 
 ```
-# Import the pandas library, which is a powerful data manipulation and analysis library
+# 匯入 pandas 函式庫，它是一個強大的資料操作和分析函式庫
 import pandas as pd
 
-# Set the maximum column width for pandas' display options to 0
-# This means that the full text of each column will be displayed without truncation when the DataFrame is printed
+# 將 pandas 的顯示選項中的最大欄寬設定為 0
+# 這意味著當 DataFrame 被列印時，每一欄的全文都會顯示而不會被截斷
 pd.set_option("display.max_colwidth", 0)
 
-# Use the pd.read_json function to load the train_sft.jsonl file from the ultrachat_200k_dataset directory into a DataFrame
-# The lines=True argument indicates that the file is in JSON Lines format, where each line is a separate JSON object
+# 使用 pd.read_json 函式從 ultrachat_200k_dataset 目錄中載入 train_sft.jsonl 檔案到 DataFrame
+# lines=True 參數表示檔案是 JSON Lines 格式，其中每一行是一個獨立的 JSON 物件
 df = pd.read_json("./ultrachat_200k_dataset/train_sft.jsonl", lines=True)
 
-# Use the head method to display the first 5 rows of the DataFrame
-# If the DataFrame has less than 5 rows, it will display all of them
+# 使用 head 方法顯示 DataFrame 的前 5 行
+# 如果 DataFrame 少於 5 行，它將顯示所有行
 df.head()
 ```
-## 5. Submit the fine tuning job using the the model and data as inputs
-Create the job that uses the chat-completion pipeline component. Learn more about all the parameters supported for fine tuning.
 
-### Define finetune parameters
+## 5. 使用模型和資料作為輸入提交微調工作
 
-Finetune parameters can be grouped into 2 categories - training parameters, optimization parameters
+建立使用聊天完成管道元件的工作。了解更多關於微調所支持的所有參數。
 
-Training parameters define the training aspects such as -
+### 定義微調參數
 
-- The optimizer, scheduler to use
-- The metric to optimize the finetune
-- Number of training steps and the batch size and so on
-- Optimization parameters help in optimizing the GPU memory and effectively using the compute resources. 
+微調參數可以分為兩類 - 訓練參數, 優化參數
 
-Below are few of the parameters that belong to this category. The optimization parameters differs for each model and are packaged with the model to handle these variations.
+訓練參數定義了訓練方面，例如 -
 
-- Enable the deepspeed and LoRA
-- Enable mixed precision training
-- Enable multi-node training
+- 優化器、調度器的使用
+- 優化微調的指標
+- 訓練步驟數量和批次大小等
+- 優化參數有助於優化 GPU 記憶體並有效利用計算資源。
 
-**Note:** Supervised finetuning may result in loosing alignment or catastrophic forgetting. We recommend checking for this issue and running an alignment stage after you finetune.
+以下是屬於此類別的一些參數。優化參數因每個模型而異，並與模型一起打包以處理這些變化。
 
-### Fine Tuning Parameters
+- 啟用 deepspeed 和 LoRA
+- 啟用混合精度訓練
+- 啟用多節點訓練
 
-This Python script is setting up parameters for fine-tuning a machine learning model. Here's a breakdown of what it does:
+**注意：** 監督微調可能會導致失去對齊或災難性遺忘。我們建議在微調後檢查此問題並執行對齊階段。
 
-It sets up default training parameters such as the number of training epochs, batch sizes for training and evaluation, learning rate, and learning rate scheduler type.
+### 微調參數
 
-It sets up default optimization parameters such as whether to apply Layer-wise Relevance Propagation (LoRa) and DeepSpeed, and the DeepSpeed stage.
+這個 Python 程式碼正在設定參數以微調機器學習模型。以下是它的作用分解：
 
-It combines the training and optimization parameters into a single dictionary called finetune_parameters.
+它設定了預設的訓練參數，例如訓練週期數、訓練和評估的批次大小、學習率和學習率調度器類型。
 
-It checks if the foundation_model has any model-specific default parameters. If it does, it prints a warning message and updates the finetune_parameters dictionary with these model-specific defaults. The ast.literal_eval function is used to convert the model-specific defaults from a string to a Python dictionary.
+它設定了預設的優化參數，例如是否應用 Layer-wise Relevance Propagation (LoRa) 和 DeepSpeed，以及 DeepSpeed 階段。
 
-It prints the final set of fine-tuning parameters that will be used for the run.
+它將訓練和優化參數結合到一個稱為 finetune_parameters 的單一字典中。
 
-In summary, this script is setting up and displaying the parameters for fine-tuning a machine learning model, with the ability to override the default parameters with model-specific ones.
+它檢查 foundation_model 是否有任何模型特定的預設參數。如果有，它會打印一條警告訊息並使用這些模型特定的預設值更新 finetune_parameters 字典。ast.literal_eval 函式被用來將模型特定的預設值從字串轉換為 Python 字典。
+
+它會列印將用於執行的最終微調參數集。
+
+總結來說，這個程式碼正在設定並顯示用於微調機器學習模型的參數，並且可以用特定模型的參數來覆蓋預設參數。
 
 ```
-# Set up default training parameters such as the number of training epochs, batch sizes for training and evaluation, learning rate, and learning rate scheduler type
+# 設定預設訓練參數，例如訓練週期數、訓練和評估的批次大小、學習率和學習率調度器類型
 training_parameters = dict(
     num_train_epochs=3,
     per_device_train_batch_size=1,
@@ -420,83 +437,84 @@ training_parameters = dict(
     lr_scheduler_type="cosine",
 )
 
-# Set up default optimization parameters such as whether to apply Layer-wise Relevance Propagation (LoRa) and DeepSpeed, and the DeepSpeed stage
+# 設定預設優化參數，例如是否應用層級相關傳播（LoRa）和 DeepSpeed，以及 DeepSpeed 階段
 optimization_parameters = dict(
     apply_lora="true",
     apply_deepspeed="true",
     deepspeed_stage=2,
 )
 
-# Combine the training and optimization parameters into a single dictionary called finetune_parameters
+# 將訓練和優化參數合併為一個名為 finetune_parameters 的字典
 finetune_parameters = {**training_parameters, **optimization_parameters}
 
-# Check if the foundation_model has any model-specific default parameters
-# If it does, print a warning message and update the finetune_parameters dictionary with these model-specific defaults
-# The ast.literal_eval function is used to convert the model-specific defaults from a string to a Python dictionary
+# 檢查 foundation_model 是否有任何模型特定的預設參數
+# 如果有，則打印警告訊息並使用這些模型特定的預設值更新 finetune_parameters 字典
+# ast.literal_eval 函式用於將模型特定的預設值從字串轉換為 Python 字典
 if "model_specific_defaults" in foundation_model.tags:
     print("Warning! Model specific defaults exist. The defaults could be overridden.")
     finetune_parameters.update(
-        ast.literal_eval(  # convert string to python dict
+        ast.literal_eval(  # 將字串轉換為 python 字典
             foundation_model.tags["model_specific_defaults"]
         )
     )
 
-# Print the final set of fine-tuning parameters that will be used for the run
+# 打印將用於執行的最終微調參數集
 print(
     f"The following finetune parameters are going to be set for the run: {finetune_parameters}"
 )
 ```
 
-### Training Pipeline
-This Python script is defining a function to generate a display name for a machine learning training pipeline, and then calling this function to generate and print the display name. Here's a breakdown of what it does:
+### 訓練管道
 
-The get_pipeline_display_name function is defined. This function generates a display name based on various parameters related to the training pipeline.
+這個 Python 程式碼定義了一個函式來產生機器學習訓練管道的顯示名稱，然後呼叫這個函式來生成並列印顯示名稱。以下是它的功能分解：
 
-Inside the function, it calculates the total batch size by multiplying the per-device batch size, the number of gradient accumulation steps, the number of GPUs per node, and the number of nodes used for fine-tuning.
+get_pipeline_display_name 函式已定義。此函式根據與訓練管道相關的各種參數生成顯示名稱。
 
-It retrieves various other parameters such as the learning rate scheduler type, whether DeepSpeed is applied, the DeepSpeed stage, whether Layer-wise Relevance Propagation (LoRa) is applied, the limit on the number of model checkpoints to keep, and the maximum sequence length.
+在函式內，它通過將每個設備的批次大小、梯度累積步驟的數量、每個節點的 GPU 數量和用於微調的節點數量相乘來計算總批次大小。
 
-It constructs a string that includes all these parameters, separated by hyphens. If DeepSpeed or LoRa is applied, the string includes "ds" followed by the DeepSpeed stage, or "lora", respectively. If not, it includes "nods" or "nolora", respectively.
+它檢索各種其他參數，例如學習率調度器類型、是否應用 DeepSpeed、DeepSpeed 階段、是否應用層級相關性傳播 (LoRa)、保留的模型檢查點數量限制以及最大序列長度。
 
-The function returns this string, which serves as the display name for the training pipeline.
+它構建了一個包含所有這些參數的字串，並以連字符分隔。如果應用了 DeepSpeed 或 LoRa，則字串分別包含 "ds" 後跟 DeepSpeed 階段，或 "lora"。如果沒有，則分別包含 "nods" 或 "nolora"。
 
-After the function is defined, it is called to generate the display name, which is then printed.
+函式返回此字串，作為訓練管道的顯示名稱。
 
-In summary, this script is generating a display name for a machine learning training pipeline based on various parameters, and then printing this display name.
+函式定義後，會呼叫它來產生顯示名稱，然後列印出來。
+
+總結來說，這段程式碼是根據各種參數生成機器學習訓練管道的顯示名稱，然後打印這個顯示名稱。
 
 ```
-# Define a function to generate a display name for the training pipeline
+# 定義一個函式來生成訓練管道的顯示名稱
 def get_pipeline_display_name():
-    # Calculate the total batch size by multiplying the per-device batch size, the number of gradient accumulation steps, the number of GPUs per node, and the number of nodes used for fine-tuning
+    # 通過將每個設備的批次大小、梯度累積步數、每個節點的 GPU 數量和用於微調的節點數量相乘來計算總批次大小
     batch_size = (
         int(finetune_parameters.get("per_device_train_batch_size", 1))
         * int(finetune_parameters.get("gradient_accumulation_steps", 1))
         * int(gpus_per_node)
         * int(finetune_parameters.get("num_nodes_finetune", 1))
     )
-    # Retrieve the learning rate scheduler type
+    # 獲取學習率調度器類型
     scheduler = finetune_parameters.get("lr_scheduler_type", "linear")
-    # Retrieve whether DeepSpeed is applied
+    # 獲取是否應用了 DeepSpeed
     deepspeed = finetune_parameters.get("apply_deepspeed", "false")
-    # Retrieve the DeepSpeed stage
+    # 獲取 DeepSpeed 階段
     ds_stage = finetune_parameters.get("deepspeed_stage", "2")
-    # If DeepSpeed is applied, include "ds" followed by the DeepSpeed stage in the display name; if not, include "nods"
+    # 如果應用了 DeepSpeed，則在顯示名稱中包含 "ds" 和 DeepSpeed 階段；如果沒有，則包含 "nods"
     if deepspeed == "true":
         ds_string = f"ds{ds_stage}"
     else:
         ds_string = "nods"
-    # Retrieve whether Layer-wise Relevance Propagation (LoRa) is applied
+    # 獲取是否應用了層次相關傳播（LoRa）
     lora = finetune_parameters.get("apply_lora", "false")
-    # If LoRa is applied, include "lora" in the display name; if not, include "nolora"
+    # 如果應用了 LoRa，則在顯示名稱中包含 "lora"；如果沒有，則包含 "nolora"
     if lora == "true":
         lora_string = "lora"
     else:
         lora_string = "nolora"
-    # Retrieve the limit on the number of model checkpoints to keep
+    # 獲取要保留的模型檢查點數量限制
     save_limit = finetune_parameters.get("save_total_limit", -1)
-    # Retrieve the maximum sequence length
+    # 獲取最大序列長度
     seq_len = finetune_parameters.get("max_seq_length", -1)
-    # Construct the display name by concatenating all these parameters, separated by hyphens
+    # 通過連接所有這些參數並用連字符分隔來構建顯示名稱
     return (
         model_name
         + "-"
@@ -513,185 +531,192 @@ def get_pipeline_display_name():
         + f"-seqlen{seq_len}"
     )
 
-# Call the function to generate the display name
+# 呼叫函式來生成顯示名稱
 pipeline_display_name = get_pipeline_display_name()
-# Print the display name
+# 列印顯示名稱
 print(f"Display name used for the run: {pipeline_display_name}")
 ```
-### Configuring Pipeline
 
-This Python script is defining and configuring a machine learning pipeline using the Azure Machine Learning SDK. Here's a breakdown of what it does:
+### 設定 Pipeline
 
-1. It imports necessary modules from the Azure AI ML SDK.
+這個 Python 程式碼正在使用 Azure Machine Learning SDK 定義和配置一個機器學習流水線。以下是它的作用分解：
 
-2. It fetches a pipeline component named "chat_completion_pipeline" from the registry.
+1. 它從 Azure AI ML SDK 匯入必要的模組。
 
-3. It defines a pipeline job using the `@pipeline` decorator and the function `create_pipeline`. The name of the pipeline is set to `pipeline_display_name`.
+2. 它從註冊表中獲取名為 "chat_completion_pipeline" 的管道元件。
 
-4. Inside the `create_pipeline` function, it initializes the fetched pipeline component with various parameters, including the model path, compute clusters for different stages, dataset splits for training and testing, the number of GPUs to use for fine-tuning, and other fine-tuning parameters.
+3. 它使用 `@pipeline` 裝飾器和函式 `create_pipeline` 定義一個管道作業。管道的名稱設置為 `pipeline_display_name`。
 
-5. It maps the output of the fine-tuning job to the output of the pipeline job. This is done so that the fine-tuned model can be easily registered, which is required to deploy the model to an online or batch endpoint.
+4. 在 `create_pipeline` 函式內，它初始化了獲取的管道元件，並設置了各種參數，包括模型路徑、不同階段的計算叢集、訓練和測試的數據集拆分、用於微調的 GPU 數量和其他微調參數。
 
-6. It creates an instance of the pipeline by calling the `create_pipeline` function.
+5. 它將微調作業的輸出映射到管道作業的輸出。這樣做是為了使微調後的模型能夠輕鬆註冊，這是將模型部署到在線或批次端點所必需的。
 
-7. It sets the `force_rerun` setting of the pipeline to `True`, meaning that cached results from previous jobs will not be used.
+6. 它通過呼叫 `create_pipeline` 函式來建立管道的實例。
 
-8. It sets the `continue_on_step_failure` setting of the pipeline to `False`, meaning that the pipeline will stop if any step fails.
+7. 它將管道的 `force_rerun` 設定設置為 `True`，這意味著不會使用先前作業的快取結果。
 
-In summary, this script is defining and configuring a machine learning pipeline for a chat completion task using the Azure Machine Learning SDK.
+8. 它將管道的 `continue_on_step_failure` 設定設置為 `False`，這意味著如果任何步驟失敗，管道將停止。
+
+總結來說，這個腳本正在使用 Azure 機器學習 SDK 定義和配置一個聊天完成任務的機器學習管道。
 
 ```
-# Import necessary modules from the Azure AI ML SDK
+# 從 Azure AI ML SDK 匯入必要的模組
 from azure.ai.ml.dsl import pipeline
 from azure.ai.ml import Input
 
-# Fetch the pipeline component named "chat_completion_pipeline" from the registry
+# 從註冊表中獲取名為 "chat_completion_pipeline" 的 pipeline 元件
 pipeline_component_func = registry_ml_client.components.get(
     name="chat_completion_pipeline", label="latest"
 )
 
-# Define the pipeline job using the @pipeline decorator and the function create_pipeline
-# The name of the pipeline is set to pipeline_display_name
+# 使用 @pipeline 裝飾器和函式 create_pipeline 定義 pipeline 作業
+# pipeline 的名稱設置為 pipeline_display_name
 @pipeline(name=pipeline_display_name)
 def create_pipeline():
-    # Initialize the fetched pipeline component with various parameters
-    # These include the model path, compute clusters for different stages, dataset splits for training and testing, the number of GPUs to use for fine-tuning, and other fine-tuning parameters
+    # 使用各種參數初始化獲取的 pipeline 元件
+    # 這些參數包括模型路徑、不同階段的計算叢集、訓練和測試的數據集拆分、用於微調的 GPU 數量以及其他微調參數
     chat_completion_pipeline = pipeline_component_func(
         mlflow_model_path=foundation_model.id,
         compute_model_import=compute_cluster,
         compute_preprocess=compute_cluster,
         compute_finetune=compute_cluster,
         compute_model_evaluation=compute_cluster,
-        # Map the dataset splits to parameters
+        # 將數據集拆分映射到參數
         train_file_path=Input(
             type="uri_file", path="./ultrachat_200k_dataset/train_sft.jsonl"
         ),
         test_file_path=Input(
             type="uri_file", path="./ultrachat_200k_dataset/test_sft.jsonl"
         ),
-        # Training settings
-        number_of_gpu_to_use_finetuning=gpus_per_node,  # Set to the number of GPUs available in the compute
+        # 訓練設置
+        number_of_gpu_to_use_finetuning=gpus_per_node,  # 設置為計算中可用的 GPU 數量
         **finetune_parameters
     )
     return {
-        # Map the output of the fine tuning job to the output of pipeline job
-        # This is done so that we can easily register the fine tuned model
-        # Registering the model is required to deploy the model to an online or batch endpoint
+        # 將微調作業的輸出映射到 pipeline 作業的輸出
+        # 這樣我們可以輕鬆註冊微調後的模型
+        # 註冊模型是將模型部署到在線或批次端點所必需的
         "trained_model": chat_completion_pipeline.outputs.mlflow_model_folder
     }
 
-# Create an instance of the pipeline by calling the create_pipeline function
+# 通過調用 create_pipeline 函式創建 pipeline 實例
 pipeline_object = create_pipeline()
 
-# Don't use cached results from previous jobs
+# 不使用先前作業的緩存結果
 pipeline_object.settings.force_rerun = True
 
-# Set continue on step failure to False
-# This means that the pipeline will stop if any step fails
+# 設置步驟失敗時繼續執行為 False
+# 這意味著如果任何步驟失敗，pipeline 將停止
 pipeline_object.settings.continue_on_step_failure = False
 ```
-### Submit the Job
 
-This Python script is submitting a machine learning pipeline job to an Azure Machine Learning workspace and then waiting for the job to complete. Here's a breakdown of what it does:
+### 提交工作
 
-It calls the create_or_update method of the jobs object in the workspace_ml_client to submit the pipeline job. The pipeline to be run is specified by pipeline_object, and the experiment under which the job is run is specified by experiment_name.
+這個 Python 程式碼正在向 Azure Machine Learning 工作區提交一個機器學習管道工作，然後等待工作完成。以下是它的作用分解：
 
-It then calls the stream method of the jobs object in the workspace_ml_client to wait for the pipeline job to complete. The job to wait for is specified by the name attribute of the pipeline_job object.
+它呼叫 workspace_ml_client 中 jobs 物件的 create_or_update 方法來提交管線工作。要執行的管線由 pipeline_object 指定，執行工作的實驗由 experiment_name 指定。
 
-In summary, this script is submitting a machine learning pipeline job to an Azure Machine Learning workspace, and then waiting for the job to complete.
+然後，它會呼叫 workspace_ml_client 中 jobs 物件的 stream 方法來等待管道工作完成。要等待的工作由 pipeline_job 物件的 name 屬性指定。
+
+總結來說，這個腳本正在提交一個機器學習管道工作到 Azure 機器學習工作區，然後等待工作完成。
 
 ```
-# Submit the pipeline job to the Azure Machine Learning workspace
-# The pipeline to be run is specified by pipeline_object
-# The experiment under which the job is run is specified by experiment_name
+# 提交管道作業到 Azure 機器學習工作區
+# 要執行的管道由 pipeline_object 指定
+# 作業執行的實驗由 experiment_name 指定
 pipeline_job = workspace_ml_client.jobs.create_or_update(
     pipeline_object, experiment_name=experiment_name
 )
 
-# Wait for the pipeline job to complete
-# The job to wait for is specified by the name attribute of the pipeline_job object
+# 等待管道作業完成
+# 要等待的作業由 pipeline_job 物件的 name 屬性指定
 workspace_ml_client.jobs.stream(pipeline_job.name)
 ```
 
-## 6. Register the fine tuned model with the workspace
-We will register the model from the output of the fine tuning job. This will track lineage between the fine tuned model and the fine tuning job. The fine tuning job, further, tracks lineage to the foundation model, data and training code.
+## 6. 在工作區中註冊微調模型
 
-### Registering the ML Model
-This Python script is registering a machine learning model that was trained in an Azure Machine Learning pipeline. Here's a breakdown of what it does:
+我們將從微調工作的輸出中註冊模型。這將追蹤微調模型和微調工作之間的關聯。微調工作進一步追蹤到基礎模型、數據和訓練程式碼的關聯。
 
-It imports necessary modules from the Azure AI ML SDK.
+### 註冊 ML 模型
 
-It checks if the trained_model output is available from the pipeline job by calling the get method of the jobs object in the workspace_ml_client and accessing its outputs attribute.
+這個 Python 程式碼正在註冊一個在 Azure Machine Learning 管道中訓練的機器學習模型。以下是它的功能分解:
 
-It constructs a path to the trained model by formatting a string with the name of the pipeline job and the name of the output ("trained_model").
+它從 Azure AI ML SDK 匯入必要的模組。
 
-It defines a name for the fine-tuned model by appending "-ultrachat-200k" to the original model name and replacing any slashes with hyphens.
+它透過呼叫 workspace_ml_client 中 jobs 物件的 get 方法並存取其 outputs 屬性來檢查 pipeline 作業是否有可用的 trained_model 輸出。
 
-It prepares to register the model by creating a Model object with various parameters, including the path to the model, the type of the model (MLflow model), the name and version of the model, and a description of the model.
+它通過使用管道作業的名稱和輸出（"trained_model"）的名稱來格式化字串，構建通向訓練模型的路徑。
 
-It registers the model by calling the create_or_update method of the models object in the workspace_ml_client with the Model object as the argument.
+它通過將 "-ultrachat-200k" 附加到原始模型名稱並將任何斜杠替換為連字符來定義微調模型的名稱。
 
-It prints the registered model.
+它準備透過建立一個 Model 物件來註冊模型，包含各種參數，包括模型的路徑、模型的類型（MLflow 模型）、模型的名稱和版本，以及模型的描述。
 
-In summary, this script is registering a machine learning model that was trained in an Azure Machine Learning pipeline.
+它透過呼叫 workspace_ml_client 中 models 物件的 create_or_update 方法，並以 Model 物件作為參數來註冊模型。
+
+它會列印已註冊的模型。
+
+總結來說，這個腳本正在註冊一個在 Azure 機器學習管道中訓練的機器學習模型。
 
 ```
-# Import necessary modules from the Azure AI ML SDK
+# 從 Azure AI ML SDK 匯入必要的模組
 from azure.ai.ml.entities import Model
 from azure.ai.ml.constants import AssetTypes
 
-# Check if the `trained_model` output is available from the pipeline job
+# 檢查 `trained_model` 輸出是否可從 pipeline job 取得
 print("pipeline job outputs: ", workspace_ml_client.jobs.get(pipeline_job.name).outputs)
 
-# Construct a path to the trained model by formatting a string with the name of the pipeline job and the name of the output ("trained_model")
+# 透過格式化字串來構建訓練模型的路徑，包含 pipeline job 的名稱和輸出名稱 ("trained_model")
 model_path_from_job = "azureml://jobs/{0}/outputs/{1}".format(
     pipeline_job.name, "trained_model"
 )
 
-# Define a name for the fine-tuned model by appending "-ultrachat-200k" to the original model name and replacing any slashes with hyphens
+# 定義微調模型的名稱，透過在原始模型名稱後附加 "-ultrachat-200k" 並將任何斜線替換為連字符
 finetuned_model_name = model_name + "-ultrachat-200k"
 finetuned_model_name = finetuned_model_name.replace("/", "-")
 
 print("path to register model: ", model_path_from_job)
 
-# Prepare to register the model by creating a Model object with various parameters
-# These include the path to the model, the type of the model (MLflow model), the name and version of the model, and a description of the model
+# 準備註冊模型，透過建立一個 Model 物件並設定各種參數
+# 包括模型的路徑、模型的類型（MLflow 模型）、模型的名稱和版本，以及模型的描述
 prepare_to_register_model = Model(
     path=model_path_from_job,
     type=AssetTypes.MLFLOW_MODEL,
     name=finetuned_model_name,
-    version=timestamp,  # Use timestamp as version to avoid version conflict
+    version=timestamp,  # 使用時間戳作為版本以避免版本衝突
     description=model_name + " fine tuned model for ultrachat 200k chat-completion",
 )
 
 print("prepare to register model: \n", prepare_to_register_model)
 
-# Register the model by calling the create_or_update method of the models object in the workspace_ml_client with the Model object as the argument
+# 透過呼叫 workspace_ml_client 中 models 物件的 create_or_update 方法並傳入 Model 物件作為參數來註冊模型
 registered_model = workspace_ml_client.models.create_or_update(
     prepare_to_register_model
 )
 
-# Print the registered model
+# 列印已註冊的模型
 print("registered model: \n", registered_model)
 ```
-## 7. Deploy the fine tuned model to an online endpoint
-Online endpoints give a durable REST API that can be used to integrate with applications that need to use the model.
 
-### Manage Endpoint
-This Python script is creating a managed online endpoint in Azure Machine Learning for a registered model. Here's a breakdown of what it does:
+## 7. 部署微調模型到線上端點
 
-It imports necessary modules from the Azure AI ML SDK.
+線上端點提供一個持久的 REST API，可以用來整合需要使用模型的應用程式。
 
-It defines a unique name for the online endpoint by appending a timestamp to the string "ultrachat-completion-".
+### 管理端點
 
-It prepares to create the online endpoint by creating a ManagedOnlineEndpoint object with various parameters, including the name of the endpoint, a description of the endpoint, and the authentication mode ("key").
+這個 Python 程式碼正在 Azure Machine Learning 中為註冊模型建立一個受管理的在線端點。以下是它的功能分解:
 
-It creates the online endpoint by calling the begin_create_or_update method of the workspace_ml_client with the ManagedOnlineEndpoint object as the argument. It then waits for the creation operation to complete by calling the wait method.
+它從 Azure AI ML SDK 匯入必要的模組。
 
-In summary, this script is creating a managed online endpoint in Azure Machine Learning for a registered model.
+它通過在字串 "ultrachat-completion-" 後附加時間戳來定義線上端點的唯一名稱。
+
+它準備透過建立一個 ManagedOnlineEndpoint 物件來建立線上端點，該物件包含各種參數，包括端點的名稱、端點的描述和驗證模式（"key"）。
+
+它通過呼叫 workspace_ml_client 的 begin_create_or_update 方法並以 ManagedOnlineEndpoint 物件作為參數來建立線上端點。然後通過呼叫 wait 方法等待建立操作完成。
+
+總結來說，此程式碼正在 Azure Machine Learning 中為已註冊的模型建立一個受管理的線上端點。
 
 ```
-# Import necessary modules from the Azure AI ML SDK
+# 從 Azure AI ML SDK 匯入必要的模組
 from azure.ai.ml.entities import (
     ManagedOnlineEndpoint,
     ManagedOnlineDeployment,
@@ -699,11 +724,11 @@ from azure.ai.ml.entities import (
     OnlineRequestSettings,
 )
 
-# Define a unique name for the online endpoint by appending a timestamp to the string "ultrachat-completion-"
+# 定義一個唯一的線上端點名稱，通過在字串 "ultrachat-completion-" 後附加一個時間戳
 online_endpoint_name = "ultrachat-completion-" + timestamp
 
-# Prepare to create the online endpoint by creating a ManagedOnlineEndpoint object with various parameters
-# These include the name of the endpoint, a description of the endpoint, and the authentication mode ("key")
+# 準備建立線上端點，通過建立一個帶有各種參數的 ManagedOnlineEndpoint 物件
+# 這些參數包括端點的名稱、端點的描述和認證模式（"key"）
 endpoint = ManagedOnlineEndpoint(
     name=online_endpoint_name,
     description="Online endpoint for "
@@ -712,54 +737,55 @@ endpoint = ManagedOnlineEndpoint(
     auth_mode="key",
 )
 
-# Create the online endpoint by calling the begin_create_or_update method of the workspace_ml_client with the ManagedOnlineEndpoint object as the argument
-# Then wait for the creation operation to complete by calling the wait method
+# 通過呼叫 workspace_ml_client 的 begin_create_or_update 方法並以 ManagedOnlineEndpoint 物件作為參數來建立線上端點
+# 然後通過呼叫 wait 方法等待建立操作完成
 workspace_ml_client.begin_create_or_update(endpoint).wait()
 ```
-You can find here the list of SKU's supported for deployment - [Managed online endpoints SKU list](https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list)
 
-### Deploying ML Model
+您可以在此處找到支援部署的 SKU 清單 - [Managed online endpoints SKU list](https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list)
 
-This Python script is deploying a registered machine learning model to a managed online endpoint in Azure Machine Learning. Here's a breakdown of what it does:
+### 部署 ML 模型
 
-It imports the ast module, which provides functions to process trees of the Python abstract syntax grammar.
+這個 Python 程式碼正在將註冊的機器學習模型部署到 Azure Machine Learning 中的受管理線上端點。以下是它的作用分解：
 
-It sets the instance type for the deployment to "Standard_NC6s_v3".
+它匯入了 ast 模組，該模組提供了處理 Python 抽象語法樹的函式。
 
-It checks if the inference_compute_allow_list tag is present in the foundation model. If it is, it converts the tag value from a string to a Python list and assigns it to inference_computes_allow_list. If it's not, it sets inference_computes_allow_list to None.
+它將部署的實例類型設置為 "Standard_NC6s_v3"。
 
-It checks if the specified instance type is in the allow list. If it's not, it prints a message asking the user to select an instance type from the allow list.
+它檢查 foundation model 中是否存在 inference_compute_allow_list 標籤。如果存在，則將標籤值從字串轉換為 Python 清單並賦值給 inference_computes_allow_list。如果不存在，則將 inference_computes_allow_list 設置為 None。
 
-It prepares to create the deployment by creating a ManagedOnlineDeployment object with various parameters, including the name of the deployment, the name of the endpoint, the ID of the model, the instance type and count, the liveness probe settings, and the request settings.
+它檢查指定的實例類型是否在允許清單中。如果不在，它會打印一條訊息，要求使用者從允許清單中選擇一個實例類型。
 
-It creates the deployment by calling the begin_create_or_update method of the workspace_ml_client with the ManagedOnlineDeployment object as the argument. It then waits for the creation operation to complete by calling the wait method.
+它準備透過建立一個帶有各種參數的 ManagedOnlineDeployment 物件來創建部署，包括部署的名稱、端點的名稱、模型的 ID、實例類型和數量、活性探測設置以及請求設置。
 
-It sets the traffic of the endpoint to direct 100% of the traffic to the "demo" deployment.
+它通過呼叫 workspace_ml_client 的 begin_create_or_update 方法並以 ManagedOnlineDeployment 物件作為參數來建立部署。然後通過呼叫 wait 方法等待建立操作完成。
 
-It updates the endpoint by calling the begin_create_or_update method of the workspace_ml_client with the endpoint object as the argument. It then waits for the update operation to complete by calling the result method.
+它將端點的流量設置為將 100% 的流量直接導向 "展示" 部署。
 
-In summary, this script is deploying a registered machine learning model to a managed online endpoint in Azure Machine Learning.
+它透過呼叫 workspace_ml_client 的 begin_create_or_update 方法並將 endpoint 物件作為參數來更新 endpoint。然後透過呼叫 result 方法等待更新操作完成。
+
+總結來說，這個腳本正在將一個註冊的機器學習模型部署到 Azure 機器學習中的受管理線上端點。
 
 ```
-# Import the ast module, which provides functions to process trees of the Python abstract syntax grammar
+# 匯入 ast 模組，該模組提供處理 Python 抽象語法樹的函式
 import ast
 
-# Set the instance type for the deployment
+# 設定部署的實例類型
 instance_type = "Standard_NC6s_v3"
 
-# Check if the `inference_compute_allow_list` tag is present in the foundation model
+# 檢查 foundation model 中是否存在 `inference_compute_allow_list` 標籤
 if "inference_compute_allow_list" in foundation_model.tags:
-    # If it is, convert the tag value from a string to a Python list and assign it to `inference_computes_allow_list`
+    # 如果存在，將標籤值從字串轉換為 Python 清單並賦值給 `inference_computes_allow_list`
     inference_computes_allow_list = ast.literal_eval(
         foundation_model.tags["inference_compute_allow_list"]
     )
     print(f"Please create a compute from the above list - {computes_allow_list}")
 else:
-    # If it's not, set `inference_computes_allow_list` to `None`
+    # 如果不存在，將 `inference_computes_allow_list` 設為 `None`
     inference_computes_allow_list = None
     print("`inference_compute_allow_list` is not part of model tags")
 
-# Check if the specified instance type is in the allow list
+# 檢查指定的實例類型是否在允許清單中
 if (
     inference_computes_allow_list is not None
     and instance_type not in inference_computes_allow_list
@@ -768,7 +794,7 @@ if (
         f"`instance_type` is not in the allow listed compute. Please select a value from {inference_computes_allow_list}"
     )
 
-# Prepare to create the deployment by creating a `ManagedOnlineDeployment` object with various parameters
+# 準備建立部署，通過建立一個帶有各種參數的 `ManagedOnlineDeployment` 物件
 demo_deployment = ManagedOnlineDeployment(
     name="demo",
     endpoint_name=online_endpoint_name,
@@ -779,72 +805,76 @@ demo_deployment = ManagedOnlineDeployment(
     request_settings=OnlineRequestSettings(request_timeout_ms=90000),
 )
 
-# Create the deployment by calling the `begin_create_or_update` method of the `workspace_ml_client` with the `ManagedOnlineDeployment` object as the argument
-# Then wait for the creation operation to complete by calling the `wait` method
+# 通過呼叫 `workspace_ml_client` 的 `begin_create_or_update` 方法並將 `ManagedOnlineDeployment` 物件作為參數來建立部署
+# 然後通過呼叫 `wait` 方法等待建立操作完成
 workspace_ml_client.online_deployments.begin_create_or_update(demo_deployment).wait()
 
-# Set the traffic of the endpoint to direct 100% of the traffic to the "demo" deployment
+# 設定端點的流量以將 100% 的流量導向 "demo" 部署
 endpoint.traffic = {"demo": 100}
 
-# Update the endpoint by calling the `begin_create_or_update` method of the `workspace_ml_client` with the `endpoint` object as the argument
-# Then wait for the update operation to complete by calling the `result` method
+# 通過呼叫 `workspace_ml_client` 的 `begin_create_or_update` 方法並將 `endpoint` 物件作為參數來更新端點
+# 然後通過呼叫 `result` 方法等待更新操作完成
 workspace_ml_client.begin_create_or_update(endpoint).result()
 ```
-## 8. Test the endpoint with sample data
-We will fetch some sample data from the test dataset and submit to online endpoint for inference. We will then show the display the scored labels alongside the ground truth labels
 
-### Reading the results
-This Python script is reading a JSON Lines file into a pandas DataFrame, taking a random sample, and resetting the index. Here's a breakdown of what it does:
+## 8. 測試端點與範例資料
 
-It reads the file ./ultrachat_200k_dataset/test_gen.jsonl into a pandas DataFrame. The read_json function is used with the lines=True argument because the file is in JSON Lines format, where each line is a separate JSON object.
+我們將從測試數據集中提取一些範例數據並提交到線上端點進行推論。然後我們將顯示得分標籤與真實標籤並排顯示。
 
-It takes a random sample of 1 row from the DataFrame. The sample function is used with the n=1 argument to specify the number of random rows to select.
+### 閱讀結果
 
-It resets the index of the DataFrame. The reset_index function is used with the drop=True argument to drop the original index and replace it with a new index of default integer values.
+這個 Python 程式碼正在將一個 JSON Lines 文件讀取到 pandas DataFrame 中，隨機取樣並重置索引。以下是它的功能分解：
 
-It displays the first 2 rows of the DataFrame using the head function with the argument 2. However, since the DataFrame only contains one row after the sampling, this will only display that one row.
+它讀取檔案 ./ultrachat_200k_dataset/test_gen.jsonl 到 pandas DataFrame 中。使用 read_json 函式並帶有 lines=True 參數，因為該檔案是 JSON Lines 格式，每一行都是一個單獨的 JSON 物件。
 
-In summary, this script is reading a JSON Lines file into a pandas DataFrame, taking a random sample of 1 row, resetting the index, and displaying the first row.
+它從 DataFrame 中隨機抽取 1 行。sample 函式與 n=1 參數一起使用，以指定要選擇的隨機行數。
+
+它會重置 DataFrame 的索引。reset_index 函式與 drop=True 參數一起使用，以刪除原始索引並將其替換為新的預設整數值索引。
+
+它使用 head 函式和參數 2 顯示 DataFrame 的前兩行。然而，由於 DataFrame 在取樣後僅包含一行，這將只顯示那一行。
+
+總結來說，這個腳本會將 JSON Lines 文件讀取到 pandas DataFrame 中，隨機抽取一行，重設索引，並顯示第一行。
 
 ```
-# Import pandas library
+# 匯入 pandas 函式庫
 import pandas as pd
 
-# Read the JSON Lines file './ultrachat_200k_dataset/test_gen.jsonl' into a pandas DataFrame
-# The 'lines=True' argument indicates that the file is in JSON Lines format, where each line is a separate JSON object
+# 將 JSON Lines 檔案 './ultrachat_200k_dataset/test_gen.jsonl' 讀取到 pandas DataFrame 中
+# 'lines=True' 參數表示檔案是 JSON Lines 格式，每行是一個單獨的 JSON 物件
 test_df = pd.read_json("./ultrachat_200k_dataset/test_gen.jsonl", lines=True)
 
-# Take a random sample of 1 row from the DataFrame
-# The 'n=1' argument specifies the number of random rows to select
+# 從 DataFrame 中隨機抽取 1 行
+# 'n=1' 參數指定要選擇的隨機行數
 test_df = test_df.sample(n=1)
 
-# Reset the index of the DataFrame
-# The 'drop=True' argument indicates that the original index should be dropped and replaced with a new index of default integer values
-# The 'inplace=True' argument indicates that the DataFrame should be modified in place (without creating a new object)
+# 重設 DataFrame 的索引
+# 'drop=True' 參數表示應該丟棄原始索引並替換為新的預設整數值索引
+# 'inplace=True' 參數表示應該直接修改 DataFrame（不建立新的物件）
 test_df.reset_index(drop=True, inplace=True)
 
-# Display the first 2 rows of the DataFrame
-# However, since the DataFrame only contains one row after the sampling, this will only display that one row
+# 顯示 DataFrame 的前 2 行
+# 但是，由於抽樣後 DataFrame 只包含一行，因此這將只顯示那一行
 test_df.head(2)
 ```
-### Create JSON Object
 
-This Python script is creating a JSON object with specific parameters and saving it to a file. Here's a breakdown of what it does:
+### 建立 JSON 物件
 
-It imports the json module, which provides functions to work with JSON data.
+這個 Python 程式碼正在建立一個具有特定參數的 JSON 物件並將其保存到檔案中。以下是它的功能分解:
 
-It creates a dictionary parameters with keys and values that represent parameters for a machine learning model. The keys are "temperature", "top_p", "do_sample", and "max_new_tokens", and their corresponding values are 0.6, 0.9, True, and 200 respectively.
+它匯入了 json 套件，該套件提供了處理 JSON 資料的函式。
 
-It creates another dictionary test_json with two keys: "input_data" and "params". The value of "input_data" is another dictionary with keys "input_string" and "parameters". The value of "input_string" is a list containing the first message from the test_df DataFrame. The value of "parameters" is the parameters dictionary created earlier. The value of "params" is an empty dictionary.
+它建立了一個字典參數，其中包含代表機器學習模型參數的鍵和值。這些鍵是 "temperature"、"top_p"、"do_sample" 和 "max_new_tokens"，它們對應的值分別是 0.6、0.9、True 和 200。
 
-It opens a file named sample_score.json
+它建立了另一個字典 test_json，包含兩個鍵："input_data" 和 "params"。"input_data" 的值是另一個字典，包含鍵 "input_string" 和 "parameters"。"input_string" 的值是一個列表，包含來自 test_df DataFrame 的第一條訊息。"parameters" 的值是之前建立的參數字典。"params" 的值是一個空字典。
+
+它打開了一個名為 sample_score.json 的文件
 
 ```
-# Import the json module, which provides functions to work with JSON data
+# 匯入 json 模組，提供處理 JSON 資訊的函式
 import json
 
-# Create a dictionary `parameters` with keys and values that represent parameters for a machine learning model
-# The keys are "temperature", "top_p", "do_sample", and "max_new_tokens", and their corresponding values are 0.6, 0.9, True, and 200 respectively
+# 建立一個字典 `parameters`，包含機器學習模型的參數鍵值對
+# 鍵為 "temperature"、"top_p"、"do_sample" 和 "max_new_tokens"，對應的值分別為 0.6、0.9、True 和 200
 parameters = {
     "temperature": 0.6,
     "top_p": 0.9,
@@ -852,11 +882,11 @@ parameters = {
     "max_new_tokens": 200,
 }
 
-# Create another dictionary `test_json` with two keys: "input_data" and "params"
-# The value of "input_data" is another dictionary with keys "input_string" and "parameters"
-# The value of "input_string" is a list containing the first message from the `test_df` DataFrame
-# The value of "parameters" is the `parameters` dictionary created earlier
-# The value of "params" is an empty dictionary
+# 建立另一個字典 `test_json`，包含兩個鍵："input_data" 和 "params"
+# "input_data" 的值是另一個字典，包含鍵 "input_string" 和 "parameters"
+# "input_string" 的值是一個列表，包含來自 `test_df` DataFrame 的第一條訊息
+# "parameters" 的值是之前建立的 `parameters` 字典
+# "params" 的值是一個空字典
 test_json = {
     "input_data": {
         "input_string": [test_df["messages"][0]],
@@ -865,57 +895,61 @@ test_json = {
     "params": {},
 }
 
-# Open a file named `sample_score.json` in the `./ultrachat_200k_dataset` directory in write mode
+# 以寫入模式打開位於 `./ultrachat_200k_dataset` 目錄中的名為 `sample_score.json` 的檔案
 with open("./ultrachat_200k_dataset/sample_score.json", "w") as f:
-    # Write the `test_json` dictionary to the file in JSON format using the `json.dump` function
+    # 使用 `json.dump` 函式將 `test_json` 字典以 JSON 格式寫入檔案
     json.dump(test_json, f)
 ```
-### Invoking Endpoint
 
-This Python script is invoking an online endpoint in Azure Machine Learning to score a JSON file. Here's a breakdown of what it does:
+### 呼叫端點
 
-It calls the invoke method of the online_endpoints property of the workspace_ml_client object. This method is used to send a request to an online endpoint and get a response.
+這個 Python 程式碼正在呼叫 Azure Machine Learning 中的一個線上端點來評分一個 JSON 文件。以下是它的作用分解:
 
-It specifies the name of the endpoint and the deployment with the endpoint_name and deployment_name arguments. In this case, the endpoint name is stored in the online_endpoint_name variable and the deployment name is "demo".
+它呼叫 workspace_ml_client 物件的 online_endpoints 屬性的 invoke 方法。此方法用於向線上端點發送請求並獲取回應。
 
-It specifies the path to the JSON file to be scored with the request_file argument. In this case, the file is ./ultrachat_200k_dataset/sample_score.json.
+它指定了端點的名稱和部署，使用 endpoint_name 和 deployment_name 參數。在這種情況下，端點名稱存儲在 online_endpoint_name 變數中，部署名稱是 "展示"。
 
-It stores the response from the endpoint in the response variable.
+它指定了要使用 request_file 參數評分的 JSON 文件的路徑。在這種情況下，文件是 ./ultrachat_200k_dataset/sample_score.json。
 
-It prints the raw response.
+它將來自端點的回應儲存在 response 變數中。
 
-In summary, this script is invoking an online endpoint in Azure Machine Learning to score a JSON file and printing the response.
+它會列印原始回應。
+
+總結來說，這個腳本正在呼叫 Azure Machine Learning 的一個線上端點來評分一個 JSON 檔案並列印回應。
 
 ```
-# Invoke the online endpoint in Azure Machine Learning to score the `sample_score.json` file
-# The `invoke` method of the `online_endpoints` property of the `workspace_ml_client` object is used to send a request to an online endpoint and get a response
-# The `endpoint_name` argument specifies the name of the endpoint, which is stored in the `online_endpoint_name` variable
-# The `deployment_name` argument specifies the name of the deployment, which is "demo"
-# The `request_file` argument specifies the path to the JSON file to be scored, which is `./ultrachat_200k_dataset/sample_score.json`
+# 呼叫 Azure Machine Learning 中的線上端點來評分 `sample_score.json` 檔案
+# 使用 `workspace_ml_client` 物件的 `online_endpoints` 屬性的 `invoke` 方法來發送請求到線上端點並獲取回應
+# `endpoint_name` 參數指定端點的名稱，該名稱存儲在 `online_endpoint_name` 變數中
+# `deployment_name` 參數指定部署的名稱，即 "demo"
+# `request_file` 參數指定要評分的 JSON 檔案的路徑，即 `./ultrachat_200k_dataset/sample_score.json`
 response = workspace_ml_client.online_endpoints.invoke(
     endpoint_name=online_endpoint_name,
     deployment_name="demo",
     request_file="./ultrachat_200k_dataset/sample_score.json",
 )
 
-# Print the raw response from the endpoint
+# 列印來自端點的原始回應
 print("raw response: \n", response, "\n")
 ```
-## 9. Delete the online endpoint
-Don't forget to delete the online endpoint, else you will leave the billing meter running for the compute used by the endpoint. This line of Python code is deleting an online endpoint in Azure Machine Learning. Here's a breakdown of what it does:
 
-It calls the begin_delete method of the online_endpoints property of the workspace_ml_client object. This method is used to start the deletion of an online endpoint.
+## 9. 刪除線上端點
 
-It specifies the name of the endpoint to be deleted with the name argument. In this case, the endpoint name is stored in the online_endpoint_name variable.
+不要忘記刪除線上端點，否則你會讓計費表因端點使用的計算資源而持續執行。這行 Python 程式碼正在刪除 Azure 機器學習中的線上端點。以下是它的作用分解：
 
-It calls the wait method to wait for the deletion operation to complete. This is a blocking operation, meaning that it will prevent the script from continuing until the deletion is finished.
+它呼叫了 workspace_ml_client 物件的 online_endpoints 屬性的 begin_delete 方法。此方法用於開始刪除線上端點。
 
-In summary, this line of code is starting the deletion of an online endpoint in Azure Machine Learning and waiting for the operation to complete.
+它使用 name 參數指定要刪除的端點名稱。在這種情況下，端點名稱存儲在 online_endpoint_name 變數中。
+
+它呼叫 wait 方法來等待刪除操作完成。這是一個阻塞操作，意味著它會阻止腳本繼續執行直到刪除完成。
+
+總結來說，這行程式碼正在啟動刪除 Azure 機器學習中的線上端點，並等待操作完成。
 
 ```
-# Delete the online endpoint in Azure Machine Learning
-# The `begin_delete` method of the `online_endpoints` property of the `workspace_ml_client` object is used to start the deletion of an online endpoint
-# The `name` argument specifies the name of the endpoint to be deleted, which is stored in the `online_endpoint_name` variable
-# The `wait` method is called to wait for the deletion operation to complete. This is a blocking operation, meaning that it will prevent the script from continuing until the deletion is finished
+# 刪除 Azure Machine Learning 中的線上端點
+# `workspace_ml_client` 物件的 `online_endpoints` 屬性的 `begin_delete` 方法用於開始刪除線上端點
+# `name` 參數指定要刪除的端點名稱，該名稱存儲在 `online_endpoint_name` 變數中
+# 呼叫 `wait` 方法以等待刪除操作完成。這是一個阻塞操作，意味著它會阻止腳本繼續執行，直到刪除完成
 workspace_ml_client.online_endpoints.begin_delete(name=online_endpoint_name).wait()
 ```
+

@@ -1,11 +1,10 @@
-## Phi-3 Models & Availability across platforms 
+﻿## Phi-3 模型 & 各平台的可用性
 
 ### Edge & Cloud Scenarios
 
 ![EdgeCloud](../../imgs/00/phiedgecloud.png)
 
-
-## Model Availability and Resources 
+## 模型可用性和資源
 
 | | | | | | | | | |
 |-|-|-|-|-|-|-|-|-|
@@ -16,4 +15,5 @@
 |Phi-3-small-8k-instruct|Text|8k|[Playground & Deployment](https://aka.ms/phi3-small-8k-azure-ml)|[Playground, Deployment](https://aka.ms/phi3-small-8k-azure-ai) & Finetuning|[CUDA](https://huggingface.co/microsoft/Phi-3-small-8k-instruct-onnx-cuda)|[Download](https://huggingface.co/microsoft/Phi-3-small-8k-instruct-onnx-cuda)|-NA-|[NIM APIs](https://build.nvidia.com/microsoft/phi-3-small-8k-instruct?docker=false)|
 |Phi-3-small-128k-instruct|Text|128k|[Playground & Deployment](https://aka.ms/phi3-small-128k-azure-ai)|[Playground, Deployment](https://aka.ms/phi3-small-128k-azure-ml) & Finetuning|[CUDA](https://huggingface.co/microsoft/Phi-3-small-128k-instruct-onnx-cuda)|[Download](https://huggingface.co/microsoft/Phi-3-small-128k-instruct)|-NA-|[NIM APIs](https://build.nvidia.com/microsoft/phi-3-small-128k-instruct?docker=false)|
 |Phi-3-medium-4k-instruct|Text|4k|[Playground & Deployment](https://huggingface.co/microsoft/Phi-3-medium-4k-instruct)|[Playground, Deployment](https://aka.ms/phi3-medium-4k-azure-ml) & Finetuning|[CUDA](https://huggingface.co/microsoft/Phi-3-medium-4k-instruct-onnx-cuda/tree/main), [CPU](https://huggingface.co/microsoft/Phi-3-medium-4k-instruct-onnx-cpu/tree/main), [DirectML](https://huggingface.co/microsoft/Phi-3-medium-4k-instruct-onnx-directml/tree/main)|[Download](https://huggingface.co/microsoft/Phi-3-medium-4k-instruct)|-NA-|[NIM APIs](https://build.nvidia.com/microsoft/phi-3-medium-4k-instruct?docker=false)|
-|Phi-3-medium-128k-instruct|Text|128k|[Playground & Deployment](https://aka.ms/phi3-medium-128k-azure-ai)|[Playground, Deployment](https://aka.ms/phi3-medium-128k-azure-ml) & Finetuning|[CUDA](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-cuda/tree/main), [CPU](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-cpu/tree/main), [DirectML](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-directml/tree/main)|[Download](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct)|-NA-|-NA-|
+|Phi-3-medium-128k-instruct|Text|128k|[Playground & Deployment](https://aka.ms/phi3-medium-128k-azure-ai)|[Playground, Deployment](https://aka.ms/phi3-medium-128k-azure-ml) & Finetuning|[CUDA](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-cuda/tree/main), [CPU](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-cpu/tree/main), [DirectML](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct-onnx-directml/tree/main)|[Download](https://huggingface.co/microsoft/Phi-3-medium-128k-instruct)|-NA-|-NA-
+

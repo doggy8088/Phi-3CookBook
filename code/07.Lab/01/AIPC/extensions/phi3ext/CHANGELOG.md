@@ -1,9 +1,10 @@
-# Change Log
+﻿# 變更記錄
 
-All notable changes to the "phi3ext" extension will be documented in this file.
+所有 "phi3ext" 擴展的顯著變更將記錄在此文件中。
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+查看 [Keep a Changelog](http://keepachangelog.com/) 以獲取如何結構此文件的建議。
 
-## [Unreleased]
+## [未發布]
 
-- Initial release
+- 初始發佈
+

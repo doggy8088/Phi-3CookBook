@@ -1,13 +1,10 @@
-# **Inference Phi-3-Vision in Local**
+﻿# **在本地推論 Phi-3-Vision**
 
-Phi-3-vision-128k-instruct allows Phi-3 to not only understand language, but also see the world visually. Through Phi-3-vision-128k-instruct, we can solve different visual problems, such as OCR, table analysis, object recognition, describe the picture etc. We can easily complete tasks that previously required a lot of data training. The following are related techniques and application scenarios cited by Phi-3-vision-128k-instruct
+Phi-3-vision-128k-instruct 允許 Phi-3 不僅理解語言，還能視覺化地看見世界。通過 Phi-3-vision-128k-instruct，我們可以解決不同的視覺問題，例如 OCR、表格分析、物件識別、描述圖片等。我們可以輕鬆完成以前需要大量數據訓練的任務。以下是 Phi-3-vision-128k-instruct 引用的相關技術和應用場景。
 
+## **0. 準備**
 
-
-## **0. Preparation**
-
-Please make sure the following Python libraries have been installed before use (Python 3.10+ is recommended)
-
+請確保在使用前已安裝以下 Python 函式庫（建議使用 Python 3.10+）
 
 ```bash
 
@@ -17,8 +14,7 @@ pip install torch -U
 
 ```
 
-It is recommended to use ***CUDA 11.6+*** and install flatten
-
+建議使用 ***CUDA 11.6+*** 並安裝 flatten
 
 ```bash
 
@@ -26,8 +22,7 @@ pip install flash-attn --no-build-isolation
 
 ```
 
-Create a new Notebook. To complete the examples, it is recommended that you create the following content first.
-
+建立一個新的 Notebook。要完成這些範例，建議您先建立以下內容。
 
 ```python
 
@@ -51,16 +46,13 @@ prompt_suffix = "<|end|>\n"
 
 ```
 
+## **1. 使用 Phi-3-Vision 分析圖像**
 
-## **1. Analyze the image with Phi-3-Vision**
-
-We want AI to be able to analyze the content of our pictures and give relevant descriptions
-
+我們希望 AI 能夠分析我們圖片的內容並給出相關描述
 
 ```python
 
-prompt = f"{user_prompt}<|image_1|>\nCould you please introduce this stock to me?{prompt_suffix}{assistant_prompt}"
-
+prompt = f"{user_prompt}<|image_1|>\n你可以向我介紹這支股票嗎？{prompt_suffix}{assistant_prompt}"
 
 url = "https://g.foolcdn.com/editorial/images/767633/nvidiadatacenterrevenuefy2017tofy2024.png"
 
@@ -68,37 +60,33 @@ image = Image.open(requests.get(url, stream=True).raw)
 
 inputs = processor(prompt, image, return_tensors="pt").to("cuda:0")
 
-generate_ids = model.generate(**inputs, 
+generate_ids = model.generate(**inputs,
                               max_new_tokens=1000,
                               eos_token_id=processor.tokenizer.eos_token_id,
                               )
 generate_ids = generate_ids[:, inputs['input_ids'].shape[1]:]
 
-response = processor.batch_decode(generate_ids, 
-                                  skip_special_tokens=True, 
+response = processor.batch_decode(generate_ids,
+                                  skip_special_tokens=True,
                                   clean_up_tokenization_spaces=False)[0]
 
 ```
 
-We can get the relevant answers by executing the following script in Notebook
-
+我們可以通過在 Notebook 中執行以下腳本來獲取相關答案
 
 ```txt
 
-Certainly! Nvidia Corporation is a global leader in advanced computing and artificial intelligence (AI). The company designs and develops graphics processing units (GPUs), which are specialized hardware accelerators used to process and render images and video. Nvidia's GPUs are widely used in professional visualization, data centers, and gaming. The company also provides software and services to enhance the capabilities of its GPUs. Nvidia's innovative technologies have applications in various industries, including automotive, healthcare, and entertainment. The company's stock is publicly traded and can be found on major stock exchanges.
+當然可以！Nvidia Corporation 是先進運算和人工智慧（AI）領域的全球領導者。該公司設計和開發圖形處理單元（GPUs），這些是用於處理和渲染圖像和影片的專用硬體加速器。Nvidia 的 GPUs 被廣泛應用於專業視覺化、資料中心和遊戲領域。該公司還提供軟體和服務，以增強其 GPUs 的功能。Nvidia 的創新技術在各行各業中都有應用，包括汽車、醫療保健和娛樂。該公司的股票是公開交易的，可以在主要的股票交易所找到。
 
 ```
 
+## **2. 使用 Phi-3-Vision 進行 OCR**
 
-## **2. OCR with Phi-3-Vision**
-
-
-In addition to analyzing the image, we can also extract information from the image. This is the OCR process that we used to need to write complex code to complete.
-
+除了分析影像之外，我們還可以從影像中提取資訊。這是我們以前需要編寫複雜程式碼才能完成的 OCR 過程。
 
 ```python
 
-prompt = f"{user_prompt}<|image_1|>\nHelp me get the title and author information of this book?{prompt_suffix}{assistant_prompt}"
+prompt = f"{user_prompt}<|image_1|>\n幫我獲取這本書的標題和作者資訊?{prompt_suffix}{assistant_prompt}"
 
 url = "https://marketplace.canva.com/EAFPHUaBrFc/1/0/1003w/canva-black-and-white-modern-alone-story-book-cover-QHBKwQnsgzs.jpg"
 
@@ -106,37 +94,34 @@ image = Image.open(requests.get(url, stream=True).raw)
 
 inputs = processor(prompt, image, return_tensors="pt").to("cuda:0")
 
-generate_ids = model.generate(**inputs, 
+generate_ids = model.generate(**inputs,
                               max_new_tokens=1000,
                               eos_token_id=processor.tokenizer.eos_token_id,
                               )
 
 generate_ids = generate_ids[:, inputs['input_ids'].shape[1]:]
 
-response = processor.batch_decode(generate_ids, 
-                                  skip_special_tokens=False, 
+response = processor.batch_decode(generate_ids,
+                                  skip_special_tokens=False,
                                   clean_up_tokenization_spaces=False)[0]
-
 
 ```
 
-The result is
-
+結果是
 
 ```txt
 
-The title of the book is "ALONE" and the author is Morgan Maxwell.
+這本書的書名是 "ALONE"，作者是 Morgan Maxwell。
 
 ```
 
-## **3. Comparison of multiple images**
+## **3. 多張圖片的比較**
 
-Phi-3 Vision supports comparison of multiple images. We can use this model to find the differences between the images.
-
+Phi-3 Vision 支援多張影像的比較。我們可以使用此模型來找出影像之間的差異。
 
 ```python
 
-prompt = f"{user_prompt}<|image_1|>\n<|image_2|>\n What is difference in this two images?{prompt_suffix}{assistant_prompt}"
+prompt = f"{user_prompt}<|image_1|>\n<|image_2|>\n 這兩張圖片有什麼不同？{prompt_suffix}{assistant_prompt}"
 
 print(f">>> Prompt\n{prompt}")
 
@@ -152,7 +137,7 @@ images = [image_1, image_2]
 
 inputs = processor(prompt, images, return_tensors="pt").to("cuda:0")
 
-generate_ids = model.generate(**inputs, 
+generate_ids = model.generate(**inputs,
                               max_new_tokens=1000,
                               eos_token_id=processor.tokenizer.eos_token_id,
                               )
@@ -161,24 +146,13 @@ generate_ids = generate_ids[:, inputs['input_ids'].shape[1]:]
 
 response = processor.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 
-
-
 ```
 
-
-The result is
-
+結果是
 
 ```txt
 
-The first image shows a group of soccer players from the Arsenal Football Club posing for a team photo with their trophies, while the second image shows a group of soccer players from the Arsenal Football Club celebrating a victory with a large crowd of fans in the background. The difference between the two images is the context in which the photos were taken, with the first image focusing on the team and their trophies, and the second image capturing a moment of celebration and victory.
+第一張圖片顯示了一群來自阿森納足球俱樂部的足球運動員與他們的獎盃一起拍攝團隊照片，而第二張圖片顯示了一群來自阿森納足球俱樂部的足球運動員在背景中與大量球迷一起慶祝勝利。兩張圖片之間的區別在於拍攝照片的背景，第一張圖片側重於團隊和他們的獎盃，第二張圖片捕捉到了慶祝和勝利的時刻。
 
 ```
-
-
-
-
-
-
-
 

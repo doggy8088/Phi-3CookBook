@@ -1,15 +1,12 @@
-# **Inference your Fine-tuning models**
+﻿# **推論你的微調模型**
 
-After fine-tuning, you can access the new model through reference, which is implemented here using ONNX Runtime GenAI.
+調整後，您可以通過參考來訪問新模型，這裡使用 ONNX Runtime GenAI 實現。
 
+## **安裝 ORT GenAI SDK**
 
-## **Install ORT GenAI SDK**
+**注意** - 請先安裝 CUDA 12.1，如果你不知道如何操作，請閱讀此指南 [https://developer.nvidia.com/cuda-12-1-0-download-archive](https://developer.nvidia.com/cuda-12-1-0-download-archive)。
 
-**Notes** - Please Install CUDA 12.1 firstly，if you don't know how to do this , please read this guideline [https://developer.nvidia.com/cuda-12-1-0-download-archive](https://developer.nvidia.com/cuda-12-1-0-download-archive)
-
-
-after finish cuda, please install onnxruntime genai sdk with cuda
-
+完成 cuda 後，請安裝具有 cuda 的 onnxruntime genai sdk
 
 ```bash
 
@@ -17,12 +14,9 @@ pip install numpy
 
 pip install onnxruntime-genai-cuda --pre --index-url=https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-genai/pypi/simple/
 
-
 ```
 
-
-## **Inference Model**
-
+## **推論模型**
 
 ```python
 
@@ -54,12 +48,7 @@ while not generator.is_done():
 
 ```
 
-### **Testing Your result**
+### **測試您的結果**
 
 ![result](../../imgs/06/e2e/result.png)
-
-
-
-
-
 

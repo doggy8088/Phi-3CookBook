@@ -1,102 +1,98 @@
-# **Build your own Visual Studio Code GitHub Copilot Chat with Microsoft Phi-3 Family**
+﻿# **建構你自己的 Visual Studio Code GitHub Copilot Chat 與 Microsoft Phi-3 Family**
 
-Have you used the workspace agent in GitHub Copilot Chat? Do you want to build your own team's code agent? This hands-on lab hopes to combine the open source model to build an enterprise-level code business agent.
+你有在 GitHub Copilot Chat 中使用 workspace agent 嗎？你想要建構你自己團隊的程式碼 agent 嗎？這個實作實驗室希望結合開源模型來建構企業級的程式碼業務 agent。
 
 ## **Foundation**
 
-### **Why choose Microsoft Phi-3**
+### **為什麼選擇 Microsoft Phi-3**
 
-Phi-3 is a family series, including phi-3-mini, phi-3-small, and phi-3-medium based on different training parameters for text generation, dialogue completion, and code generation. There is also phi-3-vision based on Vision. It is suitable for enterprises or different teams to create offline generative AI solutions.
+Phi-3 是一個系列家族，包括 phi-3-mini、phi-3-small 和 phi-3-medium，基於不同的訓練參數用於文本生成、對話完成和程式碼產生器。還有基於 Vision 的 phi-3-vision。它適合企業或不同團隊建立離線生成式 AI 解決方案。
 
-Recommended to read this link [https://github.com/microsoft/Phi-3CookBook/blob/main/md/01.Introduce/Phi3Family.md](https://github.com/microsoft/Phi-3CookBook/blob/main/md/01.Introduce/Phi3Family.md)
+建議閱讀此連結 [https://github.com/microsoft/Phi-3CookBook/blob/main/md/01.Introduce/Phi3Family.md](https://github.com/microsoft/Phi-3CookBook/blob/main/md/01.Introduce/Phi3Family.md)。
 
 ### **Microsoft GitHub Copilot Chat**
 
-The GitHub Copilot Chat extension gives you a chat interface that lets you interact with GitHub Copilot and receive answers to coding-related questions directly within VS Code, without requiring you to navigate documentation or search online forums.
+GitHub Copilot Chat 擴充功能提供了一個聊天介面，讓你可以與 GitHub Copilot 互動，並直接在 VS Code 中收到與程式碼相關問題的答案，而無需瀏覽文件或搜尋線上論壇。
 
-Copilot Chat might use syntax highlighting, indentation, and other formatting features to add clarity to the generated response. Depending upon the type of question from the user, the result can contain links to context that Copilot used for generating a response, such as source code files or documentation, or buttons for accessing VS Code functionality.
+Copilot Chat 可能會使用語法高亮、縮排和其他格式化功能來增加生成回應的清晰度。根據用戶問題的類型，結果可能包含 Copilot 用於生成回應的上下文連結，例如原始程式碼檔案或文件，或是用於存取 VS Code 功能的按鈕。
 
-- Copilot Chat integrates in your developer flow and gives you assistance where you need it:
+- Copilot Chat 整合到你的開發流程中，並在你需要的地方提供協助：
 
-- Start an inline chat conversation directly from the editor or the terminal for help while you're coding
+- 直接從編輯器或終端機開始內聯聊天對話，以在你編寫程式碼時獲得幫助
 
-- Use the Chat view to have an AI assistant on the side to help you at any time
+- 使用 Chat 視圖隨時擁有一個 AI 助手在旁協助你
 
-- Launch Quick Chat to ask a quick question and get back into what you're doing
+- 啟動 Quick Chat 以提出快速問題，並回到你正在做的事情
 
-You can use GitHub Copilot Chat in various scenarios, such as:
+你可以在各種情境下使用 GitHub Copilot Chat，例如:
 
-- Answering coding questions on how to best solve a problem
+- 解答如何最佳解決問題的程式碼問題
 
-- Explaining someone else's code and suggest improvements
+- 解釋他人的程式碼並提出改進建議
 
-- Proposing code fixes
+- 提出程式碼修正建議
 
-- Generating unit test cases
+- 產生單元測試案例
 
-- Generating code documentation
+- 產生程式碼文件
 
-Recommended to read this link [https://code.visualstudio.com/docs/copilot/copilot-chat](https://code.visualstudio.com/docs/copilot/copilot-chat)
-
+推薦閱讀此連結 [https://code.visualstudio.com/docs/copilot/copilot-chat](https://code.visualstudio.com/docs/copilot/copilot-chat)。
 
 ###  **Microsoft GitHub Copilot Chat @workspace**
 
-Referencing **@workspace** in Copilot Chat lets you ask questions about your entire codebase. Based on the question, Copilot intelligently retrieves relevant files and symbols, which it then references in its answer as links and code examples. 
+參考 **@workspace** 在 Copilot Chat 中讓你可以詢問有關整個程式碼庫的問題。根據問題，Copilot 智能地檢索相關的檔案和符號，然後在其答案中作為連結和程式碼範例引用。
 
-To answer your question, **@workspace** searches through the same sources a developer would use when navigating a codebase in VS Code:
+為了回答你的問題，**@workspace** 會搜尋開發人員在 VS Code 中瀏覽程式碼庫時會使用的相同來源：
 
-- All files in the workspace, except for files that are ignored by a .gitignore file
+- 工作區中的所有檔案，除了被 .gitignore 檔案忽略的檔案
 
-- Directory structure with nested folder and file names
+- 具有嵌套資料夾和檔案名稱的目錄結構
 
-- GitHub's code search index, if the workspace is a GitHub repository and indexed by code search
+- GitHub 的程式碼搜尋索引，如果工作區是 GitHub 儲存庫並且被程式碼搜尋索引
 
-- Symbols and definitions in the workspace
+- 工作區中的符號和定義
 
-- Currently selected text or visible text in the active editor
+- 當前選擇的文字或在活動編輯器中可見的文字
 
-Note: .gitignore is bypassed if you have a file open or have text selected within an ignored file.
+注意: 如果你有開啟一個檔案或在一個被忽略的檔案中選擇了文字，.gitignore 將被忽略。
 
-Recommended to read this link [[https://code.visualstudio.com/docs/copilot/copilot-chat](https://code.visualstudio.com/docs/copilot/workspace-context)]
+推薦閱讀此連結 [https://code.visualstudio.com/docs/copilot/copilot-chat](https://code.visualstudio.com/docs/copilot/workspace-context)
 
+## **了解更多關於這個實驗室**
 
-## **Know more about this Lab**
+GitHub Copilot 大大提升了企業的程式碼效率，每個企業都希望能夠自定義 GitHub Copilot 的相關功能。許多企業基於自己的業務場景和開源模型，自定義了類似 GitHub Copilot 的擴展。對於企業來說，自定義的擴展更容易控制，但這也影響了使用者體驗。畢竟，GitHub Copilot 在處理一般場景和專業性方面具有更強的功能。如果能保持體驗一致，並自定義企業自己的擴展會更好。GitHub Copilot Chat 提供了相關的 API，讓企業能在 Chat 體驗中進行擴展。保持一致的體驗並擁有自定義功能，是更好的使用者體驗。
 
-GitHub Copilot has greatly improved the programming efficiency of enterprises, and every enterprise hopes to customize the relevant functions of GitHub Copilot. Many enterprises have customized Extensions similar to GitHub Copilot based on their own business scenarios and open source models. For enterprises, customized Extensions are easier to control, but this also affects the user experience. After all, GitHub Copilot has stronger functions in dealing with general scenarios and professionalism. If the experience can be kept consistent, it would be better to customize the enterprise's own Extension. GitHub Copilot Chat provides relevant APIs for enterprises to expand in the Chat experience. Maintaining a consistent experience and having customized functions is a better user experience.
-
-This lab mainly uses the Phi-3 model combined with the local NPU and Azure hybrid to build a custom Agent in GitHub Copilot Chat ***@PHI3*** to assist enterprise developers in completing code generation***(@PHI3 /gen)*** and generating code based on images ***(@PHI3 /img)***.
+這個實驗室主要使用 Phi-3 模型結合本地 NPU 和 Azure 混合來建構一個自訂的 Agent 在 GitHub Copilot Chat ***@PHI3*** 以協助企業開發者完成程式碼產生***(@PHI3 /gen)***並根據圖像生成程式碼 ***(@PHI3 /img)***。
 
 ![PHI3](../../../imgs/07/01/cover.png)
 
-### ***Note:*** 
+### ***注意:***
 
-This lab is currently implemented in the AIPC of Intel CPU and Apple Silicon. We will continue to update the Qualcomm version of NPU.
+這個實驗室目前在 Intel CPU 和 Apple Silicon 的 AIPC 中實現。我們將繼續更新 Qualcomm 版本的 NPU。
 
+## **實驗室**
 
-## **Lab**
-
-
-| Name | Description | AIPC | Apple |
+```
+ Name | Description | AIPC | Apple |
 | ------------ | ----------- | -------- |-------- |
-| Lab0 - Installations(✅) | Configure and install related environments and installation tools | [Go](./HOL/AIPC/01.Installations.md) |[Go](./HOL/Apple/01.Installations.md) |
-| Lab1 - Run Prompt flow with Phi-3-mini (✅) | Combined with AIPC / Apple Silicon, using local NPU to create code generation through Phi-3-mini | [Go](./HOL/AIPC/02.PromptflowWithNPU.md) |  [Go](./HOL/Apple/02.PromptflowWithMLX.md) |
-| Lab2 - Deploy Phi-3-vision on Azure Machine Learning Service(✅) | Generate code by deploying Azure Machine Learning Service's Model Catalog - Phi-3-vision image | [Go](./HOL/AIPC/03.DeployPhi3VisionOnAzure.md) |[Go](./HOL/Apple/03.DeployPhi3VisionOnAzure.md) |
-| Lab3 - Create a @phi-3 agent in GitHub Copilot Chat(✅)  | Create a custom Phi-3 agent in GitHub Copilot Chat to complete code generation, graph generation code, RAG, etc. | [Go](./HOL/AIPC/04.CreatePhi3AgentInVSCode.md) | [Go](./HOL/Apple/04.CreatePhi3AgentInVSCode.md) |
-| Sample Code (✅)  | Download sample code | [Go](../../../code/07.Lab/01/AIPC/) | [Go](../../../code/07.Lab/01/Apple/) |
+| Lab0 - Installations(✅) | 設定和安裝相關環境和安裝工具 | [Go](./HOL/AIPC/01.Installations.md) |[Go](./HOL/Apple/01.Installations.md) |
+| Lab1 - Run Prompt flow with Phi-3-mini (✅) | 結合 AIPC / Apple Silicon，使用本地 NPU 通過 Phi-3-mini 建立程式碼產生器 | [Go](./HOL/AIPC/02.PromptflowWithNPU.md) |  [Go](./HOL/Apple/02.PromptflowWithMLX.md) |
+| Lab2 - Deploy Phi-3-vision on Azure Machine Learning Service(✅) | 部署 Azure Machine Learning Service 的模型目錄 - Phi-3-vision 映像來生成程式碼 | [Go](./HOL/AIPC/03.DeployPhi3VisionOnAzure.md) |[Go](./HOL/Apple/03.DeployPhi3VisionOnAzure.md) |
+| Lab3 - Create a @phi-3 agent in GitHub Copilot Chat(✅)  | 在 GitHub Copilot Chat 中建立自訂 Phi-3 agent 來完成程式碼產生、圖形生成程式碼、RAG 等 | [Go](./HOL/AIPC/04.CreatePhi3AgentInVSCode.md) | [Go](./HOL/Apple/04.CreatePhi3AgentInVSCode.md) |
+| Sample Code (✅)  | 下載範例程式碼 | [Go](../../../code/07.Lab/01/AIPC/) | [Go](../../../code/07.Lab/01/Apple/) 
+```
 
-
-## **Resources**
+## **資源**
 
 1. Phi-3 Cookbook [https://github.com/microsoft/Phi-3CookBook](https://github.com/microsoft/Phi-3CookBook)
 
-2. Learn more about GitHub Copilot [https://learn.microsoft.com/en-us/training/paths/copilot/](https://learn.microsoft.com/en-us/training/paths/copilot/)
+2. 了解更多關於 GitHub Copilot 的資訊 [https://learn.microsoft.com/en-us/training/paths/copilot/](https://learn.microsoft.com/en-us/training/paths/copilot/)
 
-3. Learn more about GitHub Copilot Chat [https://learn.microsoft.com/en-us/training/paths/accelerate-app-development-using-github-copilot/](https://learn.microsoft.com/en-us/training/paths/accelerate-app-development-using-github-copilot/)
+3. 了解更多關於 GitHub Copilot Chat 的資訊 [https://learn.microsoft.com/en-us/training/paths/accelerate-app-development-using-github-copilot/](https://learn.microsoft.com/en-us/training/paths/accelerate-app-development-using-github-copilot/)
 
-4. Learn more about GitHub Copilot Chat API [https://code.visualstudio.com/api/extension-guides/chat](https://code.visualstudio.com/api/extension-guides/chat)
+4. 了解更多關於 GitHub Copilot Chat API 的資訊 [https://code.visualstudio.com/api/extension-guides/chat](https://code.visualstudio.com/api/extension-guides/chat)
 
-5. Learn more about Azure AI Studio [https://learn.microsoft.com/en-us/training/paths/create-custom-copilots-ai-studio/](https://learn.microsoft.com/en-us/training/paths/create-custom-copilots-ai-studio/)
+5. 了解更多關於 Azure AI Studio 的資訊 [https://learn.microsoft.com/en-us/training/paths/create-custom-copilots-ai-studio/](https://learn.microsoft.com/en-us/training/paths/create-custom-copilots-ai-studio/)
 
-6. Learn more about Azure AI Studio's Model Catalog [https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog-overview](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog-overview)
-
+6. 了解更多關於 Azure AI Studio 的模型目錄 [https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog-overview](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog-overview)
 

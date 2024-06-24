@@ -1,67 +1,67 @@
-## Opening the project
+﻿## 開啟專案
 
-We have provided a Ollama Python Playground
+我們已經提供了一個 Ollama Python Playground
 
-This project is designed to be opened in GitHub Codespaces as an easy way for anyone to try out SLMs (small language models) entirely in the browser.
+這個專案被設計為在 GitHub Codespaces 中開啟，作為任何人都可以完全在瀏覽器中嘗試 SLMs（小型語言模型）的一種簡單方式。
 
-1. Open the Codespace in the browser using the `Code` button at the top of the repository.
-2. Once the Codespace is loaded, it should have [ollama](https://ollama.com/).
-3. Ask Ollama to run the SLM of your choice. For example, to run the [phi3](https://ollama.com/library/phi3) model:
+1. 使用倉庫頂部的 `Code` 按鈕在瀏覽器中打開 Codespace。
+2. 一旦 Codespace 加載完成，它應該有 [ollama](https://ollama.com/)。
+3. 讓 Ollama 執行你選擇的 SLM。例如，要執行 [phi3](https://ollama.com/library/phi3) 模型：
 
     ```shell
     ollama run phi3:mini
     ```
 
-    That will take a few minutes to download the model into the Codespace.
-4. Once you see "success" in the output, you can send a message to that model from the prompt.
+    這將需要幾分鐘的時間將模型下載到 Codespace。
+4. 當你在輸出中看到 "success" 時，你可以從提示中向該模型發送消息。
 
     ```shell
     >>> Write a haiku about hungry hippos
     ```
 
-5. After several seconds, you should see a response stream in from the model.
-6. To learn about different techniques used with language models, open the Python notebook `ollama.ipynb` and run each cell . If you used a model other than 'phi3:mini', change the `MODEL_NAME` in the first cell.
-7. To have a conversation with a model from Python, open the Python file `chat.py` and run it. You can change the `MODEL_NAME` at the top of the file as needed, and you can also modify the system message or add few-shot examples if desired.
+5. 幾秒鐘後，你應該會看到來自模型的響應流。
+6. 要了解語言模型使用的不同技術，打開 Python 筆記本 `ollama.ipynb` 並執行每個單元格。如果你使用了 'phi3:mini' 以外的模型，請更改第一個單元格中的 `MODEL_NAME`。
+7. 要從 Python 與模型進行對話，打開 Python 文件 `chat.py` 並執行它。你可以根據需要更改文件頂部的 `MODEL_NAME`，還可以修改系統消息或添加少量範例。
 
-You have a few options for getting started with this template.
-The quickest way to get started is GitHub Codespaces, since it will setup all the tools for you, but you can also [set it up locally](#local-environment).
+你有幾個選項可以開始使用這個模板。最快的方式是使用 GitHub Codespaces，因為它會為你設定所有工具，但你也可以[在本地環境設定](#local-environment)。
 
 ### GitHub Codespaces
 
-You can run this template virtually by using GitHub Codespaces. The button will open a web-based VS Code instance in your browser:
+您可以使用 GitHub Codespaces 虛擬執行此模板。該按鈕將在您的瀏覽器中打開一個基於網頁的 VS Code 實例:
 
-1. Open the template (this may take several minutes):
+1. 開啟範本 (這可能需要幾分鐘):
 
     [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/phi-3cookbook)
 
-2. Open a terminal window
-3. Continue with the [deployment steps](#deployment)
+2. 打開一個終端視窗
+3. 繼續進行[部署步驟](#deployment)。
 
 ### VS Code Dev Containers
 
-A related option is VS Code Dev Containers, which will open the project in your local VS Code using the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers):
+一個相關的選項是 VS Code Dev Containers，它將使用 [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) 在本地 VS Code 中打開專案:
 
-1. Start Docker Desktop (install it if not already installed)
-2. Open the project:
+1. 啟動 Docker Desktop (如果尚未安裝，請安裝)
+2. 打開專案:
 
     [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/phi-3cookbook)
 
-3. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window.
-4. Continue with the [deployment steps](#deployment)
+3. 在打開的 VS Code 視窗中，當專案檔案顯示出來時（這可能需要幾分鐘），打開一個終端視窗。
+4. 繼續進行[部署步驟](#deployment)。
 
-### Local Environment
+### 本地環境
 
-1. Make sure the following tools are installed:
+1. 確保已安裝以下工具:
 
     * [Python 3.10+](https://www.python.org/downloads/)
     * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
     * [Git](https://git-scm.com/downloads)
     * [OpenAI Python SDK](https://pypi.org/project/openai/)
 
-2. Open the project folder
+2. 打開專案資料夾
 
-3. Install OpenAI Python Library:
+3. 安裝 OpenAI Python 函式庫:
 
     ```shell
     pip install openai
     ```
+

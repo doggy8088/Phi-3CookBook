@@ -1,72 +1,72 @@
-# Ollama C# Playground
+﻿# Ollama C# Playground
 
-This labs is designed to test Phi-3 with C# samples directly in GitHub Codespaces as an easy way for anyone to try out SLMs (small language models) entirely in the browser. 
+這個實驗室旨在直接在 GitHub Codespaces 中使用 C# 範例測試 Phi-3，這是一種讓任何人都能在瀏覽器中完全試用 SLMs (小型語言模型) 的簡便方法。
 
-## how to test
+## 如何測試
 
-1. Create a new  Codespace using the `Code` button at the top of the repository. Select the [+ New with options ...]
+1. 使用倉庫頂部的 `程式碼` 按鈕建立一個新的 Codespace。選擇 [+ New with options ...]
 ![Create Codespace with options](./10NewCodespacesWithOptions.png)
 
-1. From the options page, select the configuration named `Ollama with Phi-3 for C#`
+1. 在選項頁面中，選擇名為 `Ollama with Phi-3 for C#` 的配置
 
 **IMAGE GOES HERE**
 
-1. Once the Codespace is loaded, it should have [ollama](https://ollama.com/) pre-installed, the latest Phi-3 model downloaded, and [.NET 8](https://dotnet.microsoft.com/en-us/download) installed.
+1. 一旦 Codespace 被載入，它應該已經預先安裝了 [ollama](https://ollama.com/)，下載了最新的 Phi-3 模型，並且安裝了 [.NET 8](https://dotnet.microsoft.com/en-us/download)。
 
-1. (Optional) Using the Codespace termina, ask Ollama to run [phi3](https://ollama.com/library/phi3) model:
+1. (可選) 使用 Codespace 終端機，要求 Ollama 執行 [phi3](https://ollama.com/library/phi3) 模型:
 
     ```shell
     ollama run phi3
     ```
 
-4. You can send a message to that model from the prompt.
+4. 你可以從提示符向該模型發送訊息。
 
     ```shell
     >>> Write a joke about kittens
     ```
 
-5. After several seconds, you should see a response stream in from the model.
+5. 幾秒鐘後，你應該會看到來自模型的回應流。
 
     ![run ollama and ask for a joke](./20ollamarunphi.gif)
 
-1. To learn about different techniques used with language models, check the sample projects in the `.\src` folder:
+1. 要了解與語言模型一起使用的不同技術，請查看 `.\src` 資料夾中的範例專案:
 
 | Project | Description |
 |---------|-------------|
-| Sample01  | This is a sample project that uses a the Phi-3 hosted in ollama model to answer a question.  |
-| Sample02  | This is a sample project that implement a Console chat using Semantic Kernel. |
-| [Sample03](./src/Sample03/readme.md)  | This is a sample project that implement a RAG using local embeddings and Semantic Kernel. Check the details of the local RAG [here](./src/Sample03/readme.md) |
+| Sample01  | 這是一個範例專案，使用 Phi-3 託管在 ollama 模型中回答問題。 |
+| Sample02  | 這是一個範例專案，使用 Semantic Kernel 實作一個控制台聊天。 |
+| [Sample03](./src/Sample03/readme.md)  | 這是一個範例專案，使用本地嵌入和 Semantic Kernel 實作一個 RAG。查看本地 RAG 的詳細資訊[這裡](./src/Sample03/readme.md)。
 
-## How to run a sample
+## 如何執行一個範例
 
-1. Open a terminal and navigate to the desired project. In example, let's run `Sample02`, the console chat.
+1. 打開終端並導航到所需的專案。例如，讓我們執行 `Sample02`，即控制台聊天。
 
     ```bash
     cd .\src\Sample02\
     ```
 
-1. Run the project with the command
+1. 使用以下命令執行專案
 
     ```bash
     dotnet run
     ```
 
-1. The project `Sample02`, defines a custom system message:
+1. 專案 `Sample02` 定義了一個自訂的系統訊息：
 
     ```csharp
     var history = new ChatHistory();
     history.AddSystemMessage("You are a useful chatbot. If you don't know an answer, say 'I don't know!'. Always reply in a funny ways. Use emojis if possible.");
-
     ```
 
-1. So when the user ask a question, like `What is the capital of Italy?`, the chat replies using the local mode.
-   
-    The output is similar to this one:
+1. 因此，當使用者問問題時，例如 `What is the capital of Italy?`，聊天將使用本地模式回應。
+
+    輸出類似於以下內容：
 
     ![Chat running demo](./20SampleConsole.png)
 
-## Video Tutorials
+## 影片指南
 
-If you want to learn more about how to use Codespaces with Ollama in a GitHub Repository, check the following 3 minute video:
+如果你想了解更多關於如何在 GitHub Repository 中使用 Codespaces 與 Ollama，請查看以下 3 分鐘 影片:
 
-[![Watch the video](./40ytintro.jpg)](https://youtu.be/HmKpHErUEHM)
+[![觀看影片](./40ytintro.jpg)](https://youtu.be/HmKpHErUEHM)
+

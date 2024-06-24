@@ -1,19 +1,16 @@
-# **Inference Phi-3 in Local Server**
+﻿# **在本地伺服器中推論 Phi-3**
 
-We can deploy Phi-3 on a local server. Users can choose [Ollama](https://ollama.com) or [LM Studio](https://llamaedge.com) solutions, or they can write their own code. You can connect Phi-3's local services through [Semantic Kernel](https://github.com/microsoft/semantic-kernel?WT.mc_id=aiml-138114-kinfeylo) or [Langchain](https://www.langchain.com/) to build Copilot applications
+我們可以在本地伺服器上部署 Phi-3。用戶可以選擇 [Ollama](https://ollama.com) 或 [LM Studio](https://llamaedge.com) 解決方案，或者他們可以編寫自己的程式碼。你可以通過 [Semantic Kernel](https://github.com/microsoft/semantic-kernel?WT.mc_id=aiml-138114-kinfeylo) 或 [Langchain](https://www.langchain.com/) 連接 Phi-3 的本地服務來建構 Copilot 應用程式。
 
+## **使用 Semantic Kernel 存取 Phi-3-mini**
 
-## **Use Semantic Kernel to access Phi-3-mini**
-
-In the Copilot application, we create applications through Semantic Kernel / LangChain. This type of application framework is generally compatible with Azure OpenAI Service / OpenAI models, and can also support open source models on Hugging Face and local models. What should we do if we want to use Semantic Kernel to access Phi-3-mini? Using .NET as an example, we can combine it with the Hugging Face Connector in  Semantic Kernel. By default, it can correspond to the model id on Hugging Face (the first time you use it, the model will be downloaded from Hugging Face, which takes a long time). You can also connect to the built local service. Compared with the two, we recommend using the latter because it has a higher degree of autonomy, especially in enterprise applications.
+在 Copilot 應用程式中，我們通過 Semantic Kernel / LangChain 建立應用程式。這種類型的應用程式框架通常與 Azure OpenAI Service / OpenAI 模型相容，並且也可以支援 Hugging Face 上的開源模型和本地模型。如果我們想使用 Semantic Kernel 訪問 Phi-3-mini 該怎麼辦？以 .NET 為例，我們可以將其與 Semantic Kernel 中的 Hugging Face Connector 結合使用。預設情況下，它可以對應 Hugging Face 上的模型 id（第一次使用時，模型將從 Hugging Face 下載，這需要很長時間）。你也可以連接到已建構的本地服務。相比之下，我們建議使用後者，因為它具有更高的自主性，特別是在企業應用中。
 
 ![sk](../../imgs/03/LocalServer/sk.png)
 
-
-From the figure accessing local services through Semantic Kernel can easily connect to the self-built Phi-3-mini model server. Here is the running result
-
+從圖中通過 Semantic Kernel 訪問本地服務可以輕鬆連接到自建的 Phi-3-mini 模型伺服器。這是執行結果
 
 ![skrun](../../imgs/03/LocalServer/skrun.png)
 
-***Sample Code*** https://github.com/kinfey/Phi3MiniSamples/tree/main/semantickernel
+***範例程式碼*** https://github.com/kinfey/Phi3MiniSamples/tree/main/semantickernel
 

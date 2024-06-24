@@ -1,38 +1,41 @@
-## Phi-3 Hardware Support
+﻿## Phi-3 硬體支援
 
-Microsoft Phi-3 has been optimized for ONNX Runtime and supports Windows DirectML. It works well across various hardware types, including GPUs, CPUs, and even mobile devices. 
+Microsoft Phi-3 已針對 ONNX Runtime 進行優化，並支援 Windows DirectML。它在各種硬體類型上運行良好，包括 GPU、CPU，甚至是行動裝置。
 
-### Device Hardware 
-Specifically, the supported hardware includes:
+### 裝置硬體
+
+具體來說，支援的硬體包括：
 
 - GPU SKU: RTX 4090 (DirectML)
 - GPU SKU: 1 A100 80GB (CUDA)
-- CPU SKU: Standard F64s v2 (64 vCPUs, 128 GiB memory)
+- CPU SKU: Standard F64s v2 (64 vCPUs, 128 GiB 記憶體)
 
 ### Mobile SKU
 
 - Android - Samsung Galaxy S21
-- Apple iPhone 14 or higher A16/A17 Processor
+- Apple iPhone 14 或更高版本 A16/A17 處理器
 
-### Phi-3 Hardware Specification
-- Minimum Configuration Required:
-- Windows: DirectX 12-capable GPU and a minimum of 4GB of combined RAM
+### Phi-3 硬體規格
+
+- 最低配置要求:
+- Windows: 支援 DirectX 12 的 GPU 和至少 4GB 的總 RAM
 
 CUDA: NVIDIA GPU with Compute Capability >= 7.02
 
 ![HardwareSupport](../../imgs/00/phi3hardware.png)
 
-### Running onnxruntime on multiple GPUs 
-Currently available Phi-3 ONNX models are only for 1 GPU. It's possible to support multi-gpu for Phi-3 model, but ORT with 2 gpu doesn't guarantee that it will give more throughput compared to 2 instance of ort. 
+### 在多個 GPU 上執行 onnxruntime
 
-At [Build 2024 the GenAI ONNX Team](https://youtu.be/WLW4SE8M9i8?si=EtG04UwDvcjunyfC) announced that they had enabled multi-instance instead of multi-gpu for Phi models. 
+目前可用的 Phi-3 ONNX 模型僅適用於 1 個 GPU。Phi-3 模型有可能支援多 GPU，但使用 2 個 GPU 的 ORT 並不保證會比 2 個 ORT 實例提供更高的吞吐量。
 
-At present this allows you to run one onnnxruntime or onnxruntime-genai instance with CUDA_VISIBLE_DEVICES environment variable like this.
+在 [Build 2024 the GenAI ONNX Team](https://youtu.be/WLW4SE8M9i8?si=EtG04UwDvcjunyfC) 宣布他們已經為 Phi 模型啟用了多實例而不是多 GPU。
+
+目前這允許你使用 CUDA_VISIBLE_DEVICES 環境變數來執行一個 onnnxruntime 或 onnxruntime-genai 實例，如下所示。
 
 ```Python
 CUDA_VISIBLE_DEVICES=0 python infer.py
 CUDA_VISIBLE_DEVICES=1 python infer.py
 ```
-Feel free to explore Phi-3 further in [Azure AI Studio](https://ai.azure.com) 
 
+隨時在 [Azure AI Studio](https://ai.azure.com) 進一步探索 Phi-3。
 

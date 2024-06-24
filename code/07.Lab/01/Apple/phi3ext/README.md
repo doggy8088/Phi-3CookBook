@@ -1,71 +1,117 @@
-# phi3ext README
+﻿# phi3ext README
 
-This is the README for your extension "phi3ext". After writing up a brief description, we recommend including the following sections.
+這是您的擴充功能 "phi3ext" 的 README。在撰寫簡短描述後，我們建議包含以下部分。
 
-## Features
+## 功能
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+描述您的擴充功能的特定功能，包括擴充功能執行中的截圖。圖片路徑相對於此 README 文件。
 
-For example if there is an image subfolder under your extension project workspace:
+例如，如果在擴展專案工作區下有一個圖像子資料夾:
 
-\!\[feature X\]\(images/feature-x.png\)
+![feature X](images/feature-x.png)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+> 提示: 許多流行的擴充功能利用動畫。這是一個展示你擴充功能的絕佳方式! 我們建議使用簡短、專注且易於跟隨的動畫。
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+如果你有任何需求或相依性，請新增一個章節來描述這些需求以及如何安裝和設定它們。
 
-## Extension Settings
+## 擴充設定
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+包含如果你的擴充功能通過 `contributes.configuration` 擴充點添加任何 VS Code 設定。
 
-For example:
+例如:
 
-This extension contributes the following settings:
+此擴充功能提供以下設定:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+* `myExtension.enable`: 啟用/停用此擴充功能。
+* `myExtension.thing`: 設定為 `blah` 來執行某些操作。
 
-## Known Issues
+## 已知問題
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+指出已知問題可以幫助限制用戶針對您的擴充功能開啟重複的問題。
 
-## Release Notes
+## 發行說明
 
-Users appreciate release notes as you update your extension.
+使用者會感謝您更新擴充功能的發行說明。
 
 ### 1.0.0
 
-Initial release of ...
+初始版本的 Phi-3。
+
+Phi-3 是一個新的函式庫，專為平行處理和延展性而設計。以下是一些主要功能和改進：
+
+- **平行處理**: 提供高效的佇列和堆疊管理，讓多個任意類別的呼叫能夠同時執行。
+- **交易式**: 支援交易管理，確保資料的一致性和完整性。
+- **程式碼產生器**: 自動生成高品質的程式碼片段，減少開發時間。
+- **相依性注入**: 簡化相依套件的管理，提升程式碼的可維護性。
+- **內建函式**: 提供多種內建函式，方便開發者使用。
+- **全域相容性**: 確保與現有系統和函式庫的相容性。
+
+### 安裝和設定
+
+請參考我們的[指南](https://example.com/guide)來設定 Phi-3。
+
+### 範例程式碼
+
+以下是一些範例程式碼片段，展示如何使用 Phi-3:
+
+```python
+from phi3 import Transaction, queue
+
+# 建立一個交易
+with Transaction() as txn:
+    # 將物件加入佇列
+    queue.put(物件)
+```
+
+### 影片指南
+
+觀看我們的[影片指南](https://example.com/video)來學習如何使用 Phi-3。
+
+### 延展性和品質
+
+Phi-3 已經過多次測試，確保其延展性和品質。
+
+### 即將推出
+
+我們正在準備推出更多功能和改進，敬請期待。
+
+### 聯絡我們
+
+如果有任何問題或建議，請聯絡我們。
+
+感謝您使用 Phi-3！
 
 ### 1.0.1
 
-Fixed issue #.
+修正問題 #。
 
 ### 1.1.0
 
-Added features X, Y, and Z.
+新增功能 X、Y 和 Z。
 
 ---
 
-## Following extension guidelines
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+## 遵循擴充指導方針
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+確保您已閱讀擴充功能指南，並遵循最佳實踐來建立您的擴充功能。
 
-## Working with Markdown
+* [擴充指導方針](https://code.visualstudio.com/api/references/extension-guidelines)
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+## 使用 Markdown
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+你可以使用 Visual Studio Code 編寫你的 README。以下是一些有用的編輯器鍵盤快捷鍵：
 
-## For more information
+* 分割編輯器 (`Cmd+\` 在 macOS 或 `Ctrl+\` 在 Windows 和 Linux)。
+* 切換預覽 (`Shift+Cmd+V` 在 macOS 或 `Shift+Ctrl+V` 在 Windows 和 Linux)。
+* 按下 `Ctrl+Space` (Windows, Linux, macOS) 以查看 Markdown 程式碼片段列表。
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## 更多資訊
 
-**Enjoy!**
+* [Visual Studio Code 的 Markdown 支援](http://code.visualstudio.com/docs/languages/markdown)
+* [Markdown 語法參考](https://help.github.com/articles/markdown-basics/)
+
+**享受吧!**
+

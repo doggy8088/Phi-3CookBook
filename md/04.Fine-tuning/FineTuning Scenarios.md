@@ -1,18 +1,19 @@
-## Fine Tuning Scenarios
+﻿## 微調場景
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
 |Scenario|LoRA|QLoRA|PEFT|DeepSpeed|ZeRO|DORA|
-|Adapting pre-trained LLMs to specific tasks or domains|Yes|Yes|Yes|Yes|Yes|Yes|
-|Fine-tuning for NLP tasks such as text classification, named entity recognition, and machine translation|Yes|Yes|Yes|Yes|Yes|Yes|
-|Fine-tuning for QA tasks|Yes|Yes|Yes|Yes|Yes|Yes|
-|Fine-tuning for generating human-like responses in chatbots|Yes|Yes|Yes|Yes|Yes|Yes|
-|Fine-tuning for generating music, art, or other forms of creativity|Yes|Yes|Yes|Yes|Yes|Yes|
-|Reducing computational and financial costs|Yes|Yes|No|Yes|Yes|No|
-|Reducing memory usage|No|Yes|No|Yes|Yes|Yes|
-|Using fewer parameters for efficient finetuning|No|Yes|Yes|No|No|Yes|
-|Memory-efficient form of data parallelism that gives access to the aggregate GPU memory of all the GPU devices available|No|No|No|Yes|Yes|Yes|
+|Adapting pre-trained LLMs to specific tasks or domains|是|是|是|是|是|是|
+|Fine-tuning for NLP tasks such as text classification, named entity recognition, and machine translation|是|是|是|是|是|是|
+|Fine-tuning for QA tasks|是|是|是|是|是|是|
+|Fine-tuning for generating human-like responses in chatbots|是|是|是|是|是|是|
+|Fine-tuning for generating music, art, or other forms of creativity|是|是|是|是|是|是|
+|Reducing computational and financial costs|是|是|否|是|是|否|
+|Reducing memory usage|否|是|否|是|是|是|
+|Using fewer parameters for efficient finetuning|否|是|是|否|否|是|
+|Memory-efficient form of data parallelism that gives access to the aggregate GPU memory of all the GPU devices available|否|否|否|是|是|是
 
-## Fine Tuning Performance Examples
+## 調整效能範例
 
-![Finetuning Performance](../../imgs/04/00/Finetuningexamples.png)
+![微調效能](../../imgs/04/00/Finetuningexamples.png)
+

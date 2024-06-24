@@ -1,44 +1,43 @@
-# **Inference Phi-3 in iOS**
+﻿# **在 iOS 中推論 Phi-3**
 
-Phi-3-mini is a new series of models from Microsoft that enables deployment of Large Language Models (LLMs) on edge devices and IoT devices. Phi-3-mini is available in iOS, Android, and Edge Device deployments, allowing generative AI to be deployed in BYOD. The following example deploys Phi-3-mini based on iOS
+Phi-3-mini 是 Microsoft 推出的新系列模型，能夠在邊緣設備和 IoT 設備上部署大型語言模型（LLMs）。Phi-3-mini 可用於 iOS、Android 和邊緣設備的部署，允許在 BYOD 中部署生成式 AI。以下範例基於 iOS 部署 Phi-3-mini
 
-## **1. Preparation**
-
+## **1. 準備**
 
 a. macOS 14+
 
 b. Xcode 15+
-   
-c. iOS SDK 17.x (iPhone 14 A16 or greater)
-   
-d. Install Python 3.10+ (Conda is recommended)
-   
-e. Install the Python library - python-flatbuffers
 
-f. Install CMake
+c. iOS SDK 17.x (iPhone 14 A16 或更高)
 
-### Semantic Kernel and Inference:
-Semantic Kernel is an application framework that allows you to create applications compatible with Azure OpenAI Service, OpenAI models, and even local models. Accessing local services through Semantic Kernel allows you to easily connect to your self-built Phi-3-mini model server.
+d. 安裝 Python 3.10+ (推薦使用 Conda)
 
-### Calling Quantized Models with Ollama or LlamaEdge:
-Many users prefer using quantized models to run models locally. [Ollama](https://ollama.com) and [LlamaEdge](https://llamaedge.com) allow individual users to call different quantized models:
+e. 安裝 Python 函式庫 - python-flatbuffers
+
+f. 安裝 CMake
+
+### 語義核心和推論:
+
+Semantic Kernel 是一個應用程式框架，允許你建立與 Azure OpenAI Service、OpenAI 模型，甚至本地模型相容的應用程式。通過 Semantic Kernel 訪問本地服務，可以輕鬆連接到你自建的 Phi-3-mini 模型伺服器。
+
+### 呼叫量化模型與 Ollama 或 LlamaEdge:
+
+許多使用者偏好使用量化模型來在本地執行模型。[Ollama](https://ollama.com) 和 [LlamaEdge](https://llamaedge.com) 允許個別使用者呼叫不同的量化模型：
 
 **Ollama**
-You can directly run ollama run phi3 or configure it offline. Create a Modelfile with the path to your gguf file. Sample code for running Phi-3-mini quantization model:
+你可以直接執行 ollama run phi3 或離線配置。使用 gguf 檔案的路徑建立一個 Modelfile。執行 Phi-3-mini 量化模型的範例程式碼：
 
 ```
-
 FROM {Add your gguf file path}
 TEMPLATE \"\"\"<|user|> {{.Prompt}}<|end|> <|assistant|>\"\"\"
 PARAMETER stop <|end|>
 PARAMETER num_ctx 4096
-
 ```
+
 **LlamaEdge**
-If you want to use gguf in the cloud and edge devices simultaneously, LlamaEdge can be your choice.
+如果你想在雲端和邊緣設備上同時使用 gguf，LlamaEdge 可以是你的選擇。
 
-
-## **2. Compiling ONNX Runtime for iOS**
+## **2. 編譯 ONNX Runtime for iOS**
 
 ```bash
 
@@ -51,93 +50,82 @@ cd onnxruntime
 cd ../
 
 ```
- 
-***Notice*** 
 
-  a. Before compiling, you must ensure that Xcode is configured correctly and set it on the terminal
+***注意***
 
+a. 在編譯之前，您必須確保 Xcode 已正確配置並在終端機上進行設定
 
 ```bash
 
-sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer 
+sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
 
 ```
- 
-  b. ONNX Runtime needs to be compiled based on different platforms. For iOS, you can compile based on arm64 / x86_64
-   
-  c. It is recommended to directly use the latest iOS SDK for compilation. Of course, you can also lower the version to be compatible with past SDKs.
 
+b. ONNX Runtime 需要基於不同平台進行編譯。對於 iOS，你可以基於 arm64 / x86_64 進行編譯
 
-## **3. Compiling Generative AI with ONNX Runtime for iOS**
+c. 建議直接使用最新的 iOS SDK 進行編譯。當然，你也可以降低版本以相容過去的 SDK。
 
+## **3. 使用 ONNX Runtime 為 iOS 編譯生成式 AI**
 
- ***Note:*** Because Generative AI with ONNX Runtime is in preview, please note the changes.
-
+***注意:*** 因為使用 ONNX Runtime 的生成式 AI 正在預覽中，請注意變更。
 
 ```bash
 
 git clone https://github.com/microsoft/onnxruntime-genai
- 
+
 cd onnxruntime-genai
- 
+
 mkdir ort
- 
+
 cd ort
- 
+
 mkdir include
- 
+
 mkdir lib
- 
+
 cd ../
- 
+
 cp ../onnxruntime/include/onnxruntime/core/session/onnxruntime_c_api.h ort/include
- 
+
 cp ../onnxruntime/build_ios/Release/Release-iphoneos/libonnxruntime*.dylib* ort/lib
- 
+
 export OPENCV_SKIP_XCODEBUILD_FORCE_TRYCOMPILE_DEBUG=1
- 
+
 python3 build.py --parallel --build_dir ./build_ios --ios --ios_sysroot iphoneos --ios_arch arm64 --ios_deployment_target 17.5 --cmake_generator Xcode --cmake_extra_defines CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
 
 ```
 
+## **4. 建立一個 App 應用程式在 Xcode**
 
-## **4. Create an App application in Xcode**
-
-I chose Objective-C as the App development method , because using Generative AI with ONNX Runtime C++ API, Objective-C is better compatible. Of course, you can also complete related calls through Swift bridging.
-
+我選擇 Objective-C 作為 App 開發方法，因為使用 Generative AI 與 ONNX Runtime C++ API 時，Objective-C 更具相容性。當然，你也可以通過 Swift bridging 完成相關呼叫。
 
 ![xcode](../../imgs/03/iOS/xcode.png)
 
+## **5. 複製 ONNX 量化 INT4 模型到 App 應用程式專案**
 
-## **5. Copy the ONNX quantized INT4 model to the App application project**
-
-We need to import the INT4 quantization model in ONNX format, which needs to be downloaded first
+我們需要匯入 ONNX 格式的 INT4 量化模型，這需要先下載
 
 ![hf](../../imgs/03/iOS/hf.png)
 
-After downloading, you need to add it to the Resources directory of the project in Xcode.
-
+下載後，你需要將它添加到 Xcode 專案的 Resources 目錄中。
 
 ![model](../../imgs/03/iOS/model.png)
 
+## **6. 在 ViewControllers 中添加 C++ API**
 
- ## **6. Add the C++ API in ViewControllers**
- 
-***Notice***:
+***注意***:
 
-  a. Add the corresponding C++ header file to the project
+a. 將相應的 C++ 標頭檔案新增到專案中
 
+![head](../../imgs/03/iOS/head.png)
 
-  ![head](../../imgs/03/iOS/head.png)
+b. 在 Xcode 中添加 onnxruntime-gen ai 動態庫
 
-  b. add onnxruntime-gen ai dylib in Xcode
+![函式庫](../../imgs/03/iOS/lib.png)
 
-  
-  ![lib](../../imgs/03/iOS/lib.png)
- 
-  c. Directly use the code on C Samples for testing in this samples. You can also directly add moreto run(such as ChatUI）
+c. 直接使用 C 範例上的程式碼來測試這些範例。你也可以直接添加更多來執行（例如 ChatUI)
 
-  d. Because you need to call C++, please change ViewController.m to ViewController.mm
+d. 因為你需要呼叫 C++，請將 ViewController.m 改為 ViewController.mm
 
 ```objc
 
@@ -161,14 +149,14 @@ After downloading, you need to add it to the Resources directory of the project 
     const auto output_sequence_length = output_sequences->SequenceCount(0);
     const auto* output_sequence_data = output_sequences->SequenceData(0);
     auto out_string = tokenizer->Decode(output_sequence_data, output_sequence_length);
-    
+
     auto tmp = out_string;
 
 ```
 
-
-## **7. The running results**
+## **7. 執行結果**
 
 ![result](../../imgs/03/iOS/result.jpg)
 
-***Sample Codes：*** https://github.com/Azure-Samples/Phi-3MiniSamples/tree/main/ios
+***範例程式碼：*** https://github.com/Azure-Samples/Phi-3MiniSamples/tree/main/ios
+

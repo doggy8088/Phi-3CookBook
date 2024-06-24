@@ -1,130 +1,139 @@
-# AI Toolkit for VScode (Windows)
+﻿# AI Toolkit for VScode (Windows)
 
-[AI Toolkit for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) simplifies generative AI app development by bringing together cutting-edge AI development tools and models from Azure AI Studio Catalog and other catalogs like Hugging Face. You will be able browse the AI models catalog powered by Azure ML and Hugging Face, download them locally, fine-tune, test and use them in your application.
+[AI Toolkit for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) 通過整合來自 Azure AI Studio Catalog 和其他如 Hugging Face 的目錄中的尖端 AI 開發工具和模型，簡化了生成式 AI 應用程式的開發。您將能夠瀏覽由 Azure ML 和 Hugging Face 提供支持的 AI 模型目錄，將它們下載到本地，進行微調、測試並在您的應用程式中使用。
 
-AI Toolkit Preview will run locally. Depends on the model you selected, some tasks have Windows and Linux support only, 
+AI Toolkit Preview 將在本地執行。根據您選擇的模型，一些任務僅支援 Windows 和 Linux，
 
-Local inference or fine-tune, depends on the model you selected, you may need to have GPU such as NVIDIA CUDA GPU. 
+根據你選擇的模型，本地推論或微調可能需要 GPU，例如 NVIDIA CUDA GPU。
 
-If you run remotely the cloud resource needs to have GPU, please make sure to check your environment. For local run on Windows + WSL, WSL Ubuntu distro 18.4 or greater should be installed and is set to default prior to using AI Toolkit.
+如果你遠端執行，雲端資源需要有 GPU，請確保檢查你的環境。對於在 Windows + WSL 上本地執行，應安裝 WSL Ubuntu 發行版 18.4 或更高版本，並在使用 AI Toolkit 之前設置為預設。
 
-## Getting Started
-[Learn more how to install Windows subsystem for Linux](https://learn.microsoft.com/windows/wsl/install) 
+## 開始使用
 
-and [changing default distribution](https://learn.microsoft.com/windows/wsl/install#change-the-default-linux-distribution-installed).
+[了解更多如何安裝 Windows 子系統 for Linux](https://learn.microsoft.com/windows/wsl/install)
 
-[AI Tooklit GitHub Repo](https://github.com/microsoft/vscode-ai-toolkit/)
+和 [changing default distribution](https://learn.microsoft.com/windows/wsl/install#change-the-default-linux-distribution-installed)。
 
-- Windows or Linux. 
-- **MacOS support is coming soon**
+[AI Tooklit GitHub Repo](https://github.com/microsoft/vscode-ai-toolkit/)。
 
-- For finetuning on both Windows and Linux, you'll need an Nvidia GPU. In addition, **Windows** requires subsystem for Linux with Ubuntu distro 18.4 or greater. [Learn more how to install Windows subsystem for Linux](https://learn.microsoft.com/windows/wsl/install) and [changing default distribution](https://learn.microsoft.com/windows/wsl/install#change-the-default-linux-distribution-installed).
+- Windows 或 Linux。
+- **MacOS 支援即將推出**
 
-### Install AI Toolkit 
+- 在 Windows 和 Linux 上進行微調時，你需要一個 Nvidia GPU。此外，**Windows** 需要 Linux 子系統，並且使用 Ubuntu 18.4 或更高版本。 [了解更多如何安裝 Windows 子系統 for Linux](https://learn.microsoft.com/windows/wsl/install) 和 [更改預設的發行版](https://learn.microsoft.com/windows/wsl/install#change-the-default-linux-distribution-installed)。
 
-AI Toolkit is shipped as a [Visual Studio Code Extension](https://code.visualstudio.com/docs/setup/additional-components#_vs-code-extensions), so you need to install [VS Code](https://code.visualstudio.com/docs/setup/windows) first, and download AI Toolkit from the [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio).
-The [AI Toolkit is available in the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) and can be installed like any other VS Code extension. 
+### 安裝 AI 工具包
 
-If you're unfamiliar with installing VS Code extensions, follow these steps:
+AI Toolkit 以 [Visual Studio Code Extension](https://code.visualstudio.com/docs/setup/additional-components#_vs-code-extensions) 的形式提供，因此你需要先安裝 [VS Code](https://code.visualstudio.com/docs/setup/windows)，並從 [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) 下載 AI Toolkit。
+[AI Toolkit 可在 Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-windows-ai-studio.windows-ai-studio) 中找到，並且可以像其他 VS Code 擴展一樣安裝。
 
-### Sign In
-1. In the Activity Bar in VS Code select **Extensions**
-1. In the Extensions Search bar type "AI Toolkit"
-1. Select the "AI Toolkit for Visual Studio code"
-1. Select **Install**
+如果你不熟悉安裝 VS Code 擴充功能，請按照以下步驟操作:
 
-Now, you are ready to use the extension!
+### 登入
 
-You will be prompted to sign in to GitHub, so please click "Allow" to continue. You will be redirected to GitHub signing page.
+1. 在 VS Code 的活動列中選擇 **Extensions**
+1. 在 Extensions 搜尋欄中輸入 "AI Toolkit"
+1. 選擇 "AI Toolkit for Visual Studio code"
+1. 選擇 **Install**
 
-Please sign in and follow the process steps. After successful completion, you will be redirected to VS Code.
+現在，你已經準備好使用這個擴充功能了！
 
-Once the extension has been installed you'll see the AI Toolkit icon appear in your Activity Bar.
+您將被提示登入 GitHub，請點擊 "Allow" 以繼續。您將被重定向到 GitHub 登入頁面。
 
-Let's explore the available actions!
-### Download a model from the catalog
+請登入並按照流程步驟操作。完成後，您將被重定向到 VS Code。
 
-### Available Actions
-The primary sidebar of the AI Toolkit is organized into  
+一旦擴充功能安裝完成，你會在活動欄中看到 AI Toolkit 圖示。
 
-- **Models** 
-- **Resources**
-- **Playground**  
-- **Fine-tuning** 
+讓我們探索可用的操作吧!
 
-Are available in the Resources section. To get started select 
+### 從目錄下載模型
 
-**Model Catalog**:
+### 可用動作
 
-Upon launching AI Toolkit from VS Code side bar, you can select from the following options:
+AI 工具包的主要側邊欄組織成
 
-![AI toolkit model catalog](../../imgs/04/04/AItoolkitmodel_catalog.png)
+- **模型**
+- **資源**
+- **遊樂場**
+- **微調**
 
-- Find a supported model from **Model Catalog** and download locally
-- Test model inference in the **Model Playground**
-- Fine-tune model locally or remotely in **Model Fine-tuning**
-- Deploy fine-tuned models to cloud via command palette for AI Toolkit
+資源部分提供。要開始，請選擇
 
- **GPU Vs CPU**
+**模型目錄**:
 
-You'll notice that the model cards show the model size, the platform and accelerator type (CPU, GPU). For optimized performance on **Windows devices that have at least one GPU**, select model versions that only target Windows. 
+啟動 AI Toolkit 從 VS Code 側邊欄後，你可以從以下選項中選擇:
 
-This ensures you have a model optimized for the DirectML accelerator. 
+![AI 工具包模型目錄](../../imgs/04/04/AItoolkitmodel_catalog.png)
 
-The model names are in the format of
+- 從 **Model Catalog** 中找到支援的模型並下載到本地
+- 在 **Model Playground** 中測試模型推論
+- 在 **Model Fine-tuning** 中本地或遠端微調模型
+- 通過命令調色盤將微調後的模型部署到雲端以使用 AI Toolkit
+
+**GPU Vs CPU**
+
+你會注意到模型卡片顯示了模型大小、平台和加速器類型 (CPU, GPU)。為了在**至少有一個 GPU 的 Windows 裝置**上獲得最佳效能，請選擇僅針對 Windows 的模型版本。
+
+這確保您擁有為 DirectML 加速器優化的模型。
+
+模型名稱的格式為
+
 -  `{model_name}-{accelerator}-{quantization}-{format}`.
 
->To check whether you have a GPU on your Windows device, open **Task Manager** and then select the **Performance** tab. If you have GPU(s), they will be listed under names like "GPU 0" or "GPU 1".
+>要檢查你的 Windows 裝置是否有 GPU，請打開 **Task Manager**，然後選擇 **Performance** 標籤。如果你有 GPU，它們會列在像 "GPU 0" 或 "GPU 1" 這樣的名稱下。
 
-### Run the model in the playground
+### 在 playground 中執行模型
 
-After all the parameters are set, click **Generate Project**.
+在所有參數設定完成後，點擊 **Generate Project**。
 
-Once your model has downloaded, select **Load in Playground** on the model card in the catalog:
+一旦您的模型已下載，請在目錄中的模型卡上選擇 **Load in Playground**:
 
-- Initiate the model download
-- Install all prerequisites and dependencies
-- Create VS Code workspace
+- 開始下載模型
+- 安裝所有先決條件和相依套件
+- 建立 VS Code 工作區
 
-![Load model in playground](../../imgs/04/04/AItoolkitload_model_into_playground.png)
+![在 playground 中載入模型](../../imgs/04/04/AItoolkitload_model_into_playground.png)
 
-When the model is downloaded, you can launch the project from AI Toolkit.
+當模型下載完成後，你可以從 AI Toolkit 啟動專案。
 
-> ***Note*** If you want to try preview feature to do inference or fine-tuning remotely, please follow [this guide](https://aka.ms/previewFinetune)
+> ***注意*** 如果你想嘗試預覽功能來遠端進行推論或微調，請遵循[此指南](https://aka.ms/previewFinetune)。
 
+### Windows 優化模型
 
-### Windows Optimized Models
-You should see the model response streamed back to you:
+你應該會看到模型回應串流回來：
 
-AI Toolkit offers the collection of publicly available AI models already optimized for Windows. The models are stored in the different locations including Hugging Face, GitHub and others, but you can browse the models and find all of them in one place ready for downloading and using in your Windows application.
+AI Toolkit 提供了已經為 Windows 優化的公開可用 AI 模型集合。這些模型存儲在不同的位置，包括 Hugging Face、GitHub 和其他地方，但你可以瀏覽這些模型，並在一個地方找到所有準備下載和用於你的 Windows 應用程式的模型。
 
-![Generation stream](../../imgs/04/04/AItoolkitgeneration-gif.gif)
+![生成流](../../imgs/04/04/AItoolkitgeneration-gif.gif)
 
-### Model Selections
-> If you do **not** have a **GPU** available on your *Windows* device but you selected the 
-- Phi-3-mini-4k-**directml**-int4-awq-block-128-onnx model
+### 模型選擇
 
-the model response will be *very slow*. 
+> 如果您的 *Windows* 裝置上**沒有**可用的 **GPU**，但您選擇了
 
-You should instead download the CPU optimized version: 
+- Phi-3-mini-4k-**directml**-int4-awq-block-128-onnx 模型
+
+模型回應會*非常慢*。
+
+你應該下載 CPU 優化版本:
+
 - Phi-3-mini-4k-**cpu**-int4-rtn-block-32-acc-level-4-onnx.
 
-It is also possible to change:
+也可以更改:
 
-**Context Instructions:** Help the model understand the bigger picture of your request. This could be background information, examples/demonstrations of what you want or explaining the purpose of your task.
+**上下文說明:** 幫助模型了解您請求的更大背景。這可以是背景資訊、您想要的範例/展示或解釋您任務的目的。
 
-**Inference parameters:**
-  - *Maximum response length*: The maximum number of tokens the model will return.
-  - *Temperature*: Model temperature is a parameter that controls how random a language model's output is. A higher temperature means the model takes more risks, giving you a diverse mix of words. On the other hand, a lower temperature makes the model play it safe, sticking to more focused and predictable responses.
-  - *Top P*: Also known as nucleus sampling, is a setting that controls how many possible words or phrases the language model considers when predicting the next word
-  - *Frequency penalty*: This parameter influences how often the model repeats words or phrases in its output. The higher the value (closer to 1.0) encourages the model to *avoid* repeating words or phrases.
-  - *Presence penalty*: This parameter is used in generative AI models to encourage diversity and specificity in the generated text. A higher value (closer to 1.0) encourages the model to include more novel and diverse tokens. A lower value is more likely for the model to generate common or cliche phrases.
+**推論參數:**
 
-### Use the REST API in your application 
+- *最大回應長度*: 模型將返回的最大 token 數量。
+  - *溫度*: 模型溫度是一個控制語言模型輸出隨機性的參數。較高的溫度意味著模型會承擔更多風險，給你多樣化的詞語組合。另一方面，較低的溫度使模型更保守，專注於更具預測性的回應。
+  - *Top P*: 也稱為核取樣，是一個控制語言模型在預測下一個詞時考慮多少可能詞語或短語的設定。
+  - *頻率懲罰*: 此參數影響模型在輸出中重複詞語或短語的頻率。較高的值（接近 1.0）鼓勵模型*避免*重複詞語或短語。
+  - *存在懲罰*: 此參數用於生成式 AI 模型中，以鼓勵生成文本的多樣性和特異性。較高的值（接近 1.0）鼓勵模型包含更多新穎和多樣的 token。較低的值則更可能使模型生成常見或陳詞濫調的短語。
 
-The AI Toolkit comes with a local REST API web server **on port 5272** that uses the [OpenAI chat completions format](https://platform.openai.com/docs/api-reference/chat/create). 
+### 在你的應用程式中使用 REST API
 
-This enables you to test your application locally without having to rely on a cloud AI model service. For example, the following JSON file shows how to configure the body of the request:
+AI 工具包附帶一個本地 REST API 網頁伺服器 **在 5272 埠**，使用 [OpenAI chat completions format](https://platform.openai.com/docs/api-reference/chat/create)。
+
+這使您能夠在本地測試您的應用程式，而不必依賴雲端 AI 模型服務。例如，以下 JSON 文件顯示如何配置請求的主體:
 
 ```json
 {
@@ -132,7 +141,7 @@ This enables you to test your application locally without having to rely on a cl
     "messages": [
         {
             "role": "user",
-            "content": "what is the golden ratio?"
+            "content": "黃金比例是什麼？"
         }
     ],
     "temperature": 0.7,
@@ -143,19 +152,19 @@ This enables you to test your application locally without having to rely on a cl
 }
 ```
 
-You can test the REST API using (say) [Postman](https://www.postman.com/) or the CURL (Client URL) utility:
+你可以使用（例如）[Postman](https://www.postman.com/) 或 CURL（Client URL）工具來測試 REST API:
 
 ```bash
 curl -vX POST http://127.0.0.1:5272/v1/chat/completions -H 'Content-Type: application/json' -d @body.json
 ```
 
-### Using the OpenAI client library for Python
+### 使用 OpenAI 用於 Python 的函式庫
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://127.0.0.1:5272/v1/", 
+    base_url="http://127.0.0.1:5272/v1/",
     api_key="x" # required for the API but not used
 )
 
@@ -163,7 +172,7 @@ chat_completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "what is the golden ratio?",
+            "content": "黃金比例是什麼？",
         }
     ],
     model="Phi-3-mini-4k-cuda-int4-onnx",
@@ -172,15 +181,15 @@ chat_completion = client.chat.completions.create(
 print(chat_completion.choices[0].message.content)
 ```
 
-### Using Azure OpenAI client library for .NET
+### 使用 Azure OpenAI 客戶端函式庫 for .NET
 
-Add the [Azure OpenAI client library for .NET](https://www.nuget.org/packages/Azure.AI.OpenAI/) to your project using NuGet:
+將 [Azure OpenAI client 函式庫 for .NET](https://www.nuget.org/packages/Azure.AI.OpenAI/) 使用 NuGet 添加到您的專案中:
 
 ```bash
 dotnet add {project_name} package Azure.AI.OpenAI --version 1.0.0-beta.17
 ```
 
-Add a C# file called **OverridePolicy.cs** to your project and paste the following code:
+將一個名為 **OverridePolicy.cs** 的 C# 文件添加到你的專案中，並貼上以下程式碼:
 
 ```csharp
 // OverridePolicy.cs
@@ -199,7 +208,7 @@ internal partial class OverrideRequestUriPolicy(Uri overrideUri)
 }
 ```
 
-Next, paste the following code into your **Program.cs** file:
+接下來，將以下程式碼貼到你的 **Program.cs** 檔案中:
 
 ```csharp
 // Program.cs
@@ -231,14 +240,16 @@ await foreach (StreamingChatCompletionsUpdate chatChunk in streamingChatResponse
     Console.Write(chatChunk.ContentUpdate);
 }
 ```
-## Fine Tuning with AI Toolkit
 
-- Get started with model discovery and playground.
-- Model fine-tuning and inference using local computing resources.
-- Remote fine-tuning and inference using Azure resources
+## 使用 AI 工具包進行微調
 
-[Fine Tuning with AI Toolkit](../04.Fine-tuning/Finetuning_VSCodeaitoolkit.md)
+- 開始使用模型發現和 playground。
+- 使用本地計算資源進行模型微調和推論。
+- 使用 Azure 資源進行遠端微調和推論。
+
+[使用 AI 工具包進行微調](../04.Fine-tuning/Finetuning_VSCodeaitoolkit.md)
 
 ## AI Toolkit Q&A Resources
 
-Please refer to our [Q&A page](https://github.com/microsoft/vscode-ai-toolkit/blob/main/QA.md) for most common issues and resolutions
+請參考我們的 [Q&A 頁面](https://github.com/microsoft/vscode-ai-toolkit/blob/main/QA.md) 了解最常見的問題和解決方案。
+

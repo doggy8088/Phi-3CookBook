@@ -1,70 +1,60 @@
-# **Let Phi-3 become an industry expert**
+﻿# **讓 Phi-3 成為行業專家**
 
-To put the Phi-3 model into an industry, you need to add industry business data to the Phi-3 model. We have two different options, the first is RAG (Retrieval Augmented Generation) and the second is Fine Tuning.
+要將 Phi-3 模型應用到一個行業中，你需要將行業業務數據添加到 Phi-3 模型中。我們有兩個不同的選項，第一個是 RAG (Retrieval Augmented Generation) 以及第二個是 Fine Tuning。
 
 ## **RAG vs Fine-Tuning**
 
-### **Retrieval Augmented Generation**
+### **檢索增強生成**
 
-RAG is data retrieval + text generation. The structured data and unstructured data of the enterprise are stored in the vector database. When searching for relevant content, the relevant summary and content are found to form a context, and the text completion capability of LLM/SLM is combined to generate content.
+RAG 是資料檢索 + 文字生成。企業的結構化資料和非結構化資料存儲在向量資料庫中。當搜索相關內容時，找到相關摘要和內容以形成上下文，並結合 LLM/SLM 的文字補全能力來生成內容。
 
+### **微調**
 
-### **Fine-tuning**
+微調是基於改進某個模型。它不需要從模型算法開始，但需要不斷積累數據。如果你想在行業應用中獲得更精確的術語和語言表達，微調是你的更好選擇。但如果你的數據經常變化，微調可能會變得複雜。
 
-Fine-tuning is based on improvement of a certain model. It does not need to start with the model algorithm, but data needs to be continuously accumulated. If you want more precise terminology and language expression in industry applications, fine-tuning is your better choice. But if your data changes frequently, fine-tuning can become complicated.
+### **如何選擇**
 
-### **How to choose**
+1. 如果我們的答案需要引入外部數據，RAG 是最佳選擇
 
-1. If our answer requires the introduction of external data, RAG is the best choice
+2. 如果你需要輸出穩定且精確的行業知識，微調將是一個不錯的選擇。RAG 優先拉取相關內容，但可能無法總是抓住專業的細微差別。
 
-2. If you need to output stable and precise industry knowledge, fine-tuning will be a good choice. RAG prioritizes pulling relevant content but might not always nail the specialized nuances.
+3. 微調需要高品質的數據集，如果只是小範圍的數據，效果不會有太大差別。RAG 更靈活
 
-3. Fine-tuning requires a high-quality data set, and if it is just a small range of data, it will not make much difference. RAG is more flexible
+4. 微調是一個黑箱，是一種形而上學，很難理解內部機制。但 RAG 可以更容易找到數據來源，從而有效調整幻覺或內容錯誤，並提供更好的透明度。
 
-4. Fine-tuning is a black box, a metaphysics, and it is difficult to understand the internal mechanism. But RAG can make it easier to find the source of the data, thereby effectively adjusting hallucinations or content errors and providing better transparency.
+### **情境**
 
+1. 垂直行業需要特定的專業詞彙和表達，***微調*** 將是最佳選擇
 
-### **Scenarios**
+2. QA 系統，涉及不同知識點的綜合，***RAG*** 將是最佳選擇
 
-1. Vertical industries require specific professional vocabulary and expressions, ***Fine-tuning*** will be the best choice
+3. 自動化業務流程的組合 ***RAG + 微調*** 是最佳選擇
 
-2. QA system, involving the synthesis of different knowledge points, ***RAG*** will be the best choice
-
-3. The combination of automated business flow ***RAG + Fine-tuning*** is the best choice
-
-
-## **How to use RAG**
+## **如何使用 RAG**
 
 ![rag](../../imgs/04/01/RAG.png)
 
+一個向量資料庫是一個以數學形式儲存的資料集合。向量資料庫使機器學習模型更容易記住先前的輸入，從而使機器學習能夠用於支持如搜尋、推薦和文本生成等用例。資料可以根據相似度度量來識別，而不是精確匹配，這使得電腦模型能夠理解資料的上下文。
 
-A vector database is a collection of data stored in mathematical form. Vector databases make it easier for machine learning models to remember previous inputs, enabling machine learning to be used to support use cases such as search, recommendations, and text generation. Data can be identified based on similarity metrics rather than exact matches, allowing computer models to understand the context of the data.
+向量資料庫是實現 RAG 的關鍵。我們可以通過向量模型（如 text-embedding-3、jina-ai-embedding 等）將資料轉換為向量儲存。
 
-Vector database is the key to realizing RAG. We can convert data into vector storage through vector models such as text-embedding-3, jina-ai-embedding, etc.
+了解更多關於建立 RAG 應用程式 [https://github.com/microsoft/Phi-3CookBook](https://github.com/microsoft/Phi-3CookBook?WT.mc_id=aiml-138114-kinfeylo)
 
-Learn more about create RAG application [https://github.com/microsoft/Phi-3CookBook](https://github.com/microsoft/Phi-3CookBook?WT.mc_id=aiml-138114-kinfeylo) 
+## **如何使用微調**
 
+常用的微調算法是 Lora 和 QLora。如何選擇？
 
-## **How to use Fine-tuning**
+- [了解更多範例筆記本](../../code/04.Finetuning/Phi_3_Inference_Finetuning.ipynb)
+- [Python 微調範例](../../code/04.Finetuning/FineTrainingScript.py)
 
-The commonly used algorithms in Fine-tuning are Lora and QLora. How to choose?
-- [Learn More with this sample notebook](../../code/04.Finetuning/Phi_3_Inference_Finetuning.ipynb)
-- [Example of Python FineTuning Sample](../../code/04.Finetuning/FineTrainingScript.py)
-
-### **Lora and QLora**
+### **Lora 和 QLora**
 
 ![lora](../../imgs/04/01/qlora.png)
 
+LoRA (Low-Rank Adaptation) 和 QLoRA (Quantized Low-Rank Adaptation) 都是使用參數高效微調（PEFT）來微調大型語言模型（LLMs）的技術。PEFT 技術旨在比傳統方法更高效地訓練模型。
+LoRA 是一種獨立的微調技術，通過對權重更新矩陣應用低秩近似來減少記憶體佔用。它提供了快速的訓練時間，並保持了接近傳統微調方法的性能。
 
-LoRA (Low-Rank Adaptation) and QLoRA (Quantized Low-Rank Adaptation) are both techniques used to fine-tune large language models (LLMs) using Parameter Efficient Fine Tuning (PEFT). PEFT techniques are designed to train models more efficiently than traditional methods. 
-LoRA is a standalone finetuning technique that reduces memory footprint by applying a low-rank approximation to the weight update matrix. It offers fast training times and maintains performance close to traditional fine-tuning methods. 
+QLoRA 是 LoRA 的擴展版本，結合了量化技術以進一步減少記憶體使用量。QLoRA 將預訓練 LLM 的權重參數量化為 4 位元精度，比 LoRA 更具記憶體效率。然而，由於額外的量化和反量化步驟，QLoRA 的訓練速度比 LoRA 慢約 30%。
 
-QLoRA is an extended version of LoRA that incorporates quantization techniques to further reduce memory usage. QLoRA quantizes the precision of the weight parameters in the pre-trained LLM to 4-bit precision, which is more memory efficient than LoRA. However, QLoRA training is about 30% slower than LoRA training due to the additional quantization and dequantization steps. 
-
-QLoRA uses LoRA as an accessory to fix the errors introduced during quantization errors. QLoRA enables the fine-tuning of massive models with billions of parameters on relatively small, highly available GPUs. For example, QLoRA can fine-tune a 70B parameter model that requires 36 GPUs with only 2
-
-
-
-
-
+QLoRA 使用 LoRA 作為附件來修正量化錯誤期間引入的錯誤。QLoRA 能夠在相對較小且高度可用的 GPU 上微調具有數十億參數的龐大模型。例如，QLoRA 可以用僅 2 個 GPU 微調需要 36 個 GPU 的 70B 參數模型。
 
